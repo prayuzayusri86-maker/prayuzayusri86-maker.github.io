@@ -1054,14 +1054,24 @@ function writeSheetJson(sheet, dataArray, keyField) {
       document.getElementById('cloudAutoSync').checked = cloudConfig.autoSync !== false;
     }
 
+    let _syncDebounceTimer = null;
+
+    function scheduleAutoPush() {
+      if (!cloudConfig.url) return;
+      clearTimeout(_syncDebounceTimer);
+      _syncDebounceTimer = setTimeout(() => {
+        pushToGDrive(false);
+      }, 800); // jeda 0,8 detik agar perubahan beruntun digabung jadi 1 kali kirim
+    }
+
     function saveLocalState(triggerCloud = true) {
       localStorage.setItem('esppd_pegawai_v2', JSON.stringify(pegawaiList));
       localStorage.setItem('esppd_pejabat_v2', JSON.stringify(pejabatList));
       localStorage.setItem('esppd_tarif_v1', JSON.stringify(tarifList));
       localStorage.setItem('esppd_st_v2', JSON.stringify(stList));
 
-      if (triggerCloud && cloudConfig.url && cloudConfig.autoSync) {
-        pushToGDrive(false);
+      if (triggerCloud && cloudConfig.url) {
+        scheduleAutoPush();
       }
     }
 
