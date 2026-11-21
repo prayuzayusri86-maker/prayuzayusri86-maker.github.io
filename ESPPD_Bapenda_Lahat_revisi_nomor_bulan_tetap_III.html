@@ -3038,7 +3038,7 @@ function writeSheetJson(sheet, dataArray, keyField) {
               '<tr><td style="padding:2px 0;">Pangkat / Golongan</td><td>:</td><td colspan="2">' + (p.pangkat || '-') + '</td></tr>' +
               '<tr><td style="padding:2px 0;">Jabatan</td><td>:</td><td colspan="2">' + (p.jabatan || '-') + '</td></tr>' +
               '<tr><td style="padding:2px 0;">Tujuan</td><td>:</td><td colspan="2">' + st.tujuanKota + (st.tujuanInstansi ? ' (' + st.tujuanInstansi + ')' : '') + '</td></tr>' +
-              '<tr><td style="padding:2px 0;">Lamanya Perjalanan</td><td>:</td><td colspan="2">' + st.lamaHari + ' Hari &nbsp;&nbsp; , Tanggal ' + formatTanggalIndo(st.tglBerangkat) + (st.tglBerangkat !== st.tglKembali ? ' s.d ' + formatTanggalIndo(st.tglKembali) : '') + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Lamanya Perjalanan</td><td>:</td><td colspan="2">' + st.lamaHari + ' Hari, &nbsp; Tanggal ' + formatTanggalIndo(st.tglBerangkat) + (st.tglBerangkat !== st.tglKembali ? ' s.d ' + formatTanggalIndo(st.tglKembali) : '') + '</td></tr>' +
             '</table>' +
 
             '<table class="doc-table" style="margin-bottom:10px; font-size:10pt;">' +
