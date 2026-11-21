@@ -3067,23 +3067,24 @@ function writeSheetJson(sheet, dataArray, keyField) {
               'Jumlah Uang Muka / Uang Panjar ( UM / UP ) : &nbsp;&nbsp; ' + (umRatio > 0 ? (umRatio * 100) + '% &nbsp; x &nbsp; ' + formatRupiah(grandP) + ' = <strong>' + formatRupiah(umAmount) + '</strong>' : '0') +
             '</div>' +
 
-            '<div style="display:flex; justify-content:space-between; margin-top:10px; margin-bottom:16px; font-size:10pt;">' +
+            '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:10px; margin-bottom:16px; font-size:10pt; line-height:1.35;">' +
               '<div style="width:46%;">' +
+                '<div style="visibility:hidden;">Lahat, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2026</div>' +
                 '<div>Telah dibayar UM/UP Sejumlah :</div>' +
-                '<div style="font-weight:bold; margin-bottom:6px;">' + formatRupiah(umAmount) + '</div>' +
-                '<div style="font-weight:bold;">Bendahara Pengeluaran ,</div>' +
-                '<div style="height:50px;"></div>' +
+                '<div style="font-weight:bold; margin-bottom:10px;">' + formatRupiah(umAmount) + '</div>' +
+                '<div style="font-weight:bold;">Bendahara Pengeluaran,</div>' +
+                '<div style="height:52px;"></div>' +
                 '<div style="font-weight:bold; text-decoration:underline;">' + pjBendahara.nama + '</div>' +
-                '<div>NIP. ' + pjBendahara.nip + '</div>' +
+                '<div>NIP. ' + (pjBendahara.nip || '-') + '</div>' +
               '</div>' +
               '<div style="width:46%;">' +
                 '<div>Lahat, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2026</div>' +
-                '<div>Telah Diterima UM/UP Sejumlah</div>' +
-                '<div style="font-weight:bold; margin-bottom:6px;">' + formatRupiah(umAmount) + '</div>' +
+                '<div>Telah Diterima UM/UP Sejumlah :</div>' +
+                '<div style="font-weight:bold; margin-bottom:10px;">' + formatRupiah(umAmount) + '</div>' +
                 '<div style="font-weight:bold;">Yang Menerima,</div>' +
-                '<div style="height:50px;"></div>' +
+                '<div style="height:52px;"></div>' +
                 '<div style="font-weight:bold; text-decoration:underline;">' + p.nama + '</div>' +
-                '<div>Nip. ' + (p.nip || '-') + '</div>' +
+                '<div>NIP. ' + (p.nip || '-') + '</div>' +
               '</div>' +
             '</div>' +
 
