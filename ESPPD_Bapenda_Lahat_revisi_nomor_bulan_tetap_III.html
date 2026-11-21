@@ -1,0 +1,3244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-SPPD & Rekapitulasi SPJ - Bapenda Kabupaten Lahat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .doc-font {
+      font-family: 'Tinos', 'Times New Roman', Times, serif;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .print-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        page-break-after: always;
+      }
+      .print-sheet:last-child {
+        page-break-after: auto;
+      }
+      @page {
+        size: 215mm 330mm; /* Default F4; overridden by print settings */
+        margin: 8mm;
+      }
+    }
+
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .doc-table th, .doc-table td {
+      border: 1px solid #000000;
+      padding: 4px 6px;
+      vertical-align: top;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP HEADER BAR -->
+  <header class="no-print bg-slate-900 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <!-- Lambang Kabupaten Lahat (Google Drive) -->
+        <div class="w-10 h-11 flex-shrink-0 bg-white rounded-md p-1 flex items-center justify-center shadow overflow-hidden">
+          <img src="https://lh3.googleusercontent.com/d/1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3" onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3';" alt="Logo Kabupaten Lahat" class="w-full h-full object-contain" />
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base md:text-lg font-bold tracking-tight">E-SPPD & Rekapitulasi SPJ</h1>
+            <span id="cloudStatusBadge" onclick="switchTab('cloud')" class="cursor-pointer text-[11px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 border border-slate-600 hover:bg-slate-600 transition flex items-center gap-1" title="Klik untuk mengatur Cloud Google Drive">
+              <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span id="cloudStatusText">Mode Lokal (Offline)</span>
+            </span>
+          </div>
+          <p class="text-xs text-slate-300">Badan Pendapatan Daerah Kabupaten Lahat • Bidang Pajak Daerah & Retribusi</p>
+        </div>
+      </div>
+
+      <!-- NAVIGATION TABS -->
+      <nav class="flex flex-wrap items-center gap-1.5 text-xs md:text-sm">
+        <button onclick="switchTab('dashboard')" id="tabBtn-dashboard" class="tab-btn px-3 py-2 rounded-lg font-medium bg-sky-600 text-white transition">
+          Dashboard & Rekap SPJ
+        </button>
+        <button onclick="switchTab('form')" id="tabBtn-form" class="tab-btn px-3 py-2 rounded-lg font-medium text-slate-300 hover:bg-slate-800 transition">
+          + Input / Edit ST & SPD
+        </button>
+        <button onclick="switchTab('master')" id="tabBtn-master" class="tab-btn px-3 py-2 rounded-lg font-medium text-slate-300 hover:bg-slate-800 transition">
+          Data Master Pegawai
+        </button>
+        <button onclick="switchTab('print')" id="tabBtn-print" class="tab-btn px-3 py-2 rounded-lg font-medium text-slate-300 hover:bg-slate-800 transition">
+          Pratinjau & Cetak Dokumen
+        </button>
+        <button onclick="switchTab('cloud')" id="tabBtn-cloud" class="tab-btn px-3 py-2 rounded-lg font-medium text-emerald-300 border border-emerald-700/60 hover:bg-emerald-900/50 transition flex items-center gap-1">
+          <span>☁️ Pengaturan GDrive</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toastBox" class="no-print fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white text-sm px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-2.5">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">Berhasil disimpan</span>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
+    <!-- ========================================================= -->
+    <!-- TAB 1: DASHBOARD & REKAPITULASI SPJ                       -->
+    <!-- ========================================================= -->
+    <section id="tab-dashboard" class="tab-section space-y-6">
+      <!-- KPI CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-xs font-semibold text-slate-500 uppercase">Total Surat Tugas (ST)</div>
+          <div id="kpiTotalST" class="text-2xl font-bold text-slate-900 mt-1">0</div>
+          <div class="text-xs text-slate-400 mt-1">Rek. 5.1.02.04.01.0001</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-xs font-semibold text-slate-500 uppercase">Total Lembar SPD Terbit</div>
+          <div id="kpiTotalSPD" class="text-2xl font-bold text-sky-700 mt-1">0</div>
+          <div class="text-xs text-slate-400 mt-1">Personel yang ditugaskan</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <div class="text-xs font-semibold text-slate-500 uppercase">Total Realisasi SPJ</div>
+          <div id="kpiTotalBiaya" class="text-2xl font-bold text-emerald-700 mt-1">Rp 0</div>
+          <div class="text-xs text-slate-400 mt-1">Sesuai Kuitansi & Rincian</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between">
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase">Sinkronisasi Cloud GDrive</div>
+            <div id="kpiCloudInfo" class="text-xs text-slate-600 mt-1">Belum terhubung ke Google Sheets</div>
+          </div>
+          <div class="flex gap-2 mt-2">
+            <button onclick="pullFromGDrive(true)" class="flex-1 text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold py-1.5 px-2 rounded border border-sky-200 transition">
+              ↓ Tarik Data
+            </button>
+            <button onclick="pushToGDrive(true)" class="flex-1 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold py-1.5 px-2 rounded border border-emerald-200 transition">
+              ↑ Simpan Cloud
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTER & ACTION BAR -->
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2 flex-1">
+          <input type="text" id="filterSearch" oninput="renderDashboard()" placeholder="Cari No. ST, Nama Pegawai, Tujuan, atau Kegiatan..." class="w-full md:w-72 text-sm px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          <select id="filterKategori" onchange="renderDashboard()" class="text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="ALL">Semua Kategori Perjadin</option>
+            <option value="Dalam Daerah">Dalam Daerah (Kab. Lahat)</option>
+            <option value="Luar Daerah (Dalam Provinsi)">Luar Daerah (Dalam Provinsi Sumsel)</option>
+            <option value="Luar Daerah Provinsi Sumsel">Luar Daerah Provinsi Sumsel</option>
+          </select>
+          <select id="filterBulan" onchange="renderDashboard()" class="text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+            <option value="ALL">Semua Bulan</option>
+            <option value="01">Januari</option>
+            <option value="02">Februari</option>
+            <option value="03">Maret</option>
+            <option value="04">April</option>
+            <option value="05">Mei</option>
+            <option value="06">Juni</option>
+            <option value="07">Juli</option>
+            <option value="08">Agustus</option>
+            <option value="09">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Desember</option>
+          </select>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="exportRekapCSV()" class="text-xs md:text-sm bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
+            📊 Export Rekap Excel (CSV)
+          </button>
+          <button onclick="openNewSTForm()" class="text-xs md:text-sm bg-sky-600 hover:bg-sky-700 text-white font-semibold px-3.5 py-2 rounded-lg shadow-sm transition">
+            + Buat ST & SPD Baru
+          </button>
+        </div>
+      </div>
+
+      <!-- TABEL REKAPITULASI SURAT TUGAS & SPJ -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-800 text-white text-xs uppercase">
+                <th class="py-3 px-4">No</th>
+                <th class="py-3 px-4">Nomor ST & Kategori</th>
+                <th class="py-3 px-4">Maksud Kegiatan & Tujuan</th>
+                <th class="py-3 px-4">Tanggal & Lama</th>
+                <th class="py-3 px-4">Personel & Nomor SPD</th>
+                <th class="py-3 px-4 text-right">Total SPJ (Rp)</th>
+                <th class="py-3 px-4 text-center">Aksi & Cetak</th>
+              </tr>
+            </thead>
+            <tbody id="rekapTableBody" class="divide-y divide-slate-200">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 2: FORM INPUT / EDIT SURAT TUGAS, SPD & RINCIAN SPJ   -->
+    <!-- ========================================================= -->
+    <section id="tab-form" class="tab-section hidden space-y-6">
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-4 mb-5">
+          <div>
+            <h2 id="formTitle" class="text-lg font-bold text-slate-900">Buat Surat Tugas (ST) & SPD Baru</h2>
+            <p class="text-xs text-slate-500">Isi data surat tugas, pilih/tambah personel pelaksana, dan lengkapi rincian biaya SPJ.</p>
+          </div>
+          <button onclick="switchTab('dashboard')" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100">
+            ← Kembali ke Daftar
+          </button>
+        </div>
+
+        <input type="hidden" id="editStId" value="" />
+
+        <!-- BAGIAN 1: DATA UMUM SURAT TUGAS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Perjalanan Dinas *</label>
+            <select id="fKategori" onchange="handleKategoriChange()" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white">
+              <option value="Dalam Daerah">Dalam Daerah (Kabupaten Lahat)</option>
+              <option value="Luar Daerah (Dalam Provinsi)">Luar Daerah (Dalam Provinsi Sumsel)</option>
+              <option value="Luar Daerah Provinsi Sumsel">Luar Daerah Provinsi Sumsel</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Surat Tugas (ST) <span class="text-slate-400 font-normal">(Isi angka saja)</span></label>
+            <input type="text" id="fNoST" inputmode="numeric" placeholder="Contoh: 312 (tanpa 900 dan garis miring)" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Induk SPD <span class="text-slate-400 font-normal">(Isi angka saja)</span></label>
+            <input type="text" id="fNoSPDBase" inputmode="numeric" placeholder="Contoh: 312 (tanpa kode surat)" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+            <span class="text-[11px] text-slate-400">Nomor lengkap dibuat otomatis; diberi akhiran a, b, c jika personel lebih dari 1.</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Perjalanan</label>
+            <select id="fJenisPerjadin" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white">
+              <option value="Perjalanan Dinas Biasa">Perjalanan Dinas Biasa</option>
+              <option value="Perjalanan Dinas Diklat">Perjalanan Dinas Diklat / Bimtek</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Penetapan ST & SPD *</label>
+            <input type="date" id="fTglST" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kode Rekening / Mata Anggaran</label>
+            <select id="fMataAnggaran" onchange="updateNoBuktiKwtOtomatis()" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white font-medium text-slate-800">
+              <option value="5.1.02.04.001.0001">5.1.02.04.001.0001 (Perjalanan Dinas Biasa)</option>
+              <option value="5.1.02.01.001.0003">5.1.02.01.001.0003 (Perjalanan Dinas Dalam Daerah)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Berangkat *</label>
+            <input type="date" id="fTglBerangkat" onchange="hitungLamaHari()" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Kembali *</label>
+            <input type="date" id="fTglKembali" onchange="hitungLamaHari()" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Lama Perjalanan (Hari)</label>
+            <input type="number" id="fLamaHari" min="1" value="1" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg font-semibold text-sky-700" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tempat Berangkat</label>
+            <input type="text" id="fAsal" value="Lahat" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Instansi / Lokasi Tujuan *</label>
+            <input type="text" id="fTujuanInstansi" placeholder="Contoh: Badan Pemeriksa Keuangan / Kec. Lahat" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div id="tujuanPilihanWrap" class="md:col-span-3 hidden">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Kabupaten/Kota Tujuan yang Pernah Digunakan</label>
+            <select id="fTujuanKotaPilihan" onchange="pilihTujuanTerdaftar()" class="w-full text-sm px-3 py-2 border border-sky-300 rounded-lg bg-sky-50">
+              <option value="">-- Pilih Kabupaten/Kota Tujuan --</option>
+            </select>
+            <p class="text-[11px] text-slate-500 mt-1">Daftar disaring berdasarkan kategori perjalanan, dari Master Tarif dan ST yang pernah disimpan. Jika tujuan belum tersedia, isi kolom di bawah secara manual.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Kota / Kab. Tujuan</label>
+              <input type="text" id="fTujuanKota" onchange="handleTujuanManualChange('kota')" placeholder="Pilih dari daftar atau ketik manual" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Provinsi Tujuan</label>
+              <input type="text" id="fTujuanProv" onchange="handleTujuanManualChange('provinsi')" value="Sumatera Selatan" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Dasar Surat Tugas</label>
+            <textarea id="fDasar" rows="2" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg">Peraturan Daerah Kabupaten Lahat Nomor 01 Tahun 2024 tentang Pajak Daerah dan Retribusi Daerah</textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Alat Angkut yang Digunakan</label>
+            <select id="fAlatAngkut" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white">
+              <option value="Angkutan Darat">Angkutan Darat</option>
+              <option value="Angkutan Udara & Darat">Angkutan Udara & Darat</option>
+              <option value="Kendaraan Dinas / Pribadi">Kendaraan Dinas / Pribadi</option>
+              <option value="Angkutan Umum / Travel">Angkutan Umum / Travel</option>
+            </select>
+          </div>
+
+          <div class="md:col-span-3">
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Maksud Perjalanan Dinas / Nama Kegiatan *</label>
+            <textarea id="fMaksud" rows="2" placeholder="Contoh: Mengikuti Action Plan Tindak Lanjut hasil Audit BPK RI atas LKPD Kabupaten Lahat TA 2025..." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+          </div>
+        </div>
+
+        <!-- BAGIAN 2: PEJABAT PENANDATANGAN & DATA KWITANSI / TBP -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 space-y-4">
+          <h3 class="text-sm font-bold text-slate-800">Pejabat Penandatangan Dokumen & Pengaturan Kwitansi (TBP/SBP)</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Penandatangan Surat Tugas (ST)</label>
+              <select id="fTtdST" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Pengguna Anggaran (SPD & Kwitansi)</label>
+              <select id="fTtdSPD" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Pejabat Pelaksana Teknis Kegiatan (PPTK)</label>
+              <select id="fTtdPPTK" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Bendahara Pengeluaran</label>
+              <select id="fTtdBendahara" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-3 border-t border-slate-200">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Perwakilan Penerima Kwitansi (1 Orang) *</label>
+              <select id="fPenerimaKwitansiIdx" onchange="onChangePenerimaKwitansi()" class="w-full text-sm px-3 py-2 border border-sky-300 rounded-lg bg-sky-50 font-semibold text-sky-900">
+                <option value="0">Personel #1 (Utama)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor Bukti Kwitansi (Opsional)</label>
+              <input type="text" id="fNoBuktiKwt" placeholder="900/     /     /01.09/5.1.02.04.001.00001/BAPENDA/III/2026" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+            </div>
+            <div>
+  <label class="block text-xs font-semibold text-slate-700 mb-1">Sub Kegiatan *</label>
+  <select id="fSubKegiatan" onchange="updateNoBuktiKwtOtomatis()" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white font-medium text-slate-800">
+    <option value="5.02.04.2.01.0005 Pendataan dan Pendaftaran Objek Pajak Daerah">5.02.04.2.01.0005 - Pendataan dan Pendaftaran Objek Pajak Daerah</option>
+    <option value="5.02.04.2.01.0008 Penetapan Wajib Pajak Daerah">5.02.04.2.01.0008 - Penetapan Wajib Pajak Daerah</option>
+    <option value="5.02.04.2.01.0009 Pelayanan dan Konsultasi Pajak Daerah" selected>5.02.04.2.01.0009 - Pelayanan dan Konsultasi Pajak Daerah</option>
+    <option value="5.02.04.2.01.0010 Penelitian dan Verifikasi Data Pelaporan Pajak Daerah">5.02.04.2.01.0010 - Penelitian dan Verifikasi Data Pelaporan Pajak Daerah</option>
+    <option value="5.02.04.2.01.0011 Penagihan Pajak Daerah">5.02.04.2.01.0011 - Penagihan Pajak Daerah</option>
+    <option value="5.02.04.2.01.0015 Elektronifikasi Transaksi Pemerintah Daerah">5.02.04.2.01.0015 - Elektronifikasi Transaksi Pemerintah Daerah</option>
+  </select>
+</div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Rek. Giro SKPD / Bank</label>
+              <input type="text" id="fRekGiroSKPD" value="14231000472 / Bank Sumsel Cabang Lahat" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NPWP Penerima Kwitansi</label>
+              <input type="text" id="fKwtNpwp" placeholder="Contoh: 1604092412720002" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Bank Penerima Kwitansi</label>
+              <input type="text" id="fKwtBank" value="Sumsel Babel Cabang Lahat" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">No. Rekening Penerima Kwitansi</label>
+              <input type="text" id="fKwtNorek" placeholder="Contoh: 1420107082" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Persentase Uang Muka (UM/UP)</label>
+              <select id="fUmPersen" class="w-full text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white">
+                <option value="0">0% (Tanpa Uang Muka / Langsung LS)</option>
+                <option value="0.75">75% (Uang Panjar 0.75)</option>
+                <option value="1">100% (Lunas)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- BAGIAN 3: DAFTAR PERSONEL & RINCIAN BIAYA SPJ -->
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Personel yang Diperintahkan & Rincian Biaya SPJ</h3>
+              <p class="text-xs text-slate-500">Pilih pegawai dari Data Master atau ketik manual personel baru.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="addPersonelRow(null, false)" class="text-xs bg-sky-600 hover:bg-sky-700 text-white font-semibold px-3 py-2 rounded-lg shadow-sm transition">
+                + Tambah Personel (Dari Master)
+              </button>
+              <button type="button" onclick="addPersonelRow(null, true)" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-2 rounded-lg shadow-sm transition">
+                + Input Personel Baru (Manual)
+              </button>
+            </div>
+          </div>
+
+          <div id="personelContainer" class="space-y-4">
+            <!-- Personel cards rendered here -->
+          </div>
+        </div>
+
+        <!-- SUBMIT BUTTONS -->
+        <div class="mt-6 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="text-sm font-semibold text-slate-700">
+            Total Keseluruhan SPJ ST Ini: <span id="formGrandTotal" class="text-lg font-bold text-emerald-700">Rp 0</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="switchTab('dashboard')" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100">
+              Batal
+            </button>
+            <button type="button" onclick="saveSTForm()" class="px-5 py-2 text-sm rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow">
+              💾 Simpan Surat Tugas & Sinkronkan
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 3: DATA MASTER PEGAWAI & PEJABAT PENANDATANGAN        -->
+    <!-- ========================================================= -->
+    <section id="tab-master" class="tab-section hidden space-y-6">
+      <!-- MASTER PEGAWAI -->
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Data Master Pegawai & Tim Sinergi</h2>
+            <p class="text-xs text-slate-500">Kelola identitas pegawai, NPWP, dan rekening penerima. Tarif uang harian dan penginapan dikelola terpisah berdasarkan kota tujuan dan kategori SBU.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openPegawaiModal()" class="text-xs bg-sky-600 hover:bg-sky-700 text-white font-semibold px-3.5 py-2 rounded-lg shadow-sm">
+              + Tambah Pegawai Baru
+            </button>
+            <button onclick="resetDefaultMaster()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-3 py-2 rounded-lg">
+              Reset Data Bawaan
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 mb-4">
+          <input type="text" id="searchMasterPegawai" oninput="renderMasterTables()" placeholder="Cari Nama, NIP, atau Jabatan..." class="w-full md:w-72 text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          <select id="filterMasterSBU" onchange="renderMasterTables()" class="text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white">
+            <option value="ALL">Semua Kategori SBU</option>
+            <option value="Eselon II">Eselon II</option>
+            <option value="Eselon III">Eselon III</option>
+            <option value="Gol IV">Gol IV</option>
+            <option value="Eselon IV">Eselon IV</option>
+            <option value="Gol III">Gol III / ASN</option>
+            <option value="Gol II">Gol II / PPPK</option>
+            <option value="Non-ASN">Non-ASN / Tim Eksternal</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-800 text-white text-xs uppercase">
+                <th class="py-2.5 px-3">No</th>
+                <th class="py-2.5 px-3">Nama Lengkap & Gelar</th>
+                <th class="py-2.5 px-3">NIP / NRP / NIPPPK</th>
+                <th class="py-2.5 px-3">Pangkat / Golongan</th>
+                <th class="py-2.5 px-3">Jabatan</th>
+                <th class="py-2.5 px-3">Kategori SBU</th>
+                <th class="py-2.5 px-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="masterPegawaiBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- MASTER TARIF BERDASARKAN TUJUAN -->
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-900">Master Tarif Perjalanan Dinas Berdasarkan Tujuan</h2>
+          <p class="text-xs text-slate-500">Tarif ditentukan oleh kota tujuan, kategori perjalanan, dan kelompok SBU pegawai; bukan berdasarkan nama pegawai.</p>
+        </div>
+        <input type="hidden" id="tarifEditId" value="" />
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-sky-50 p-3 rounded-lg border border-sky-100">
+          <div><label class="block text-xs font-semibold mb-1">Kota Tujuan *</label><input id="tfKota" class="w-full text-sm px-2 py-2 border rounded" placeholder="Contoh: Palembang" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Provinsi *</label><input id="tfProvinsi" class="w-full text-sm px-2 py-2 border rounded" placeholder="Sumatera Selatan" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Kategori Perjalanan *</label><select id="tfKategori" class="w-full text-sm px-2 py-2 border rounded bg-white"><option value="Dalam Daerah">Dalam Daerah</option><option value="Luar Daerah (Dalam Provinsi)" selected>Luar Daerah (Dalam Provinsi)</option><option value="Luar Daerah Provinsi Sumsel">Luar Daerah Provinsi Sumsel</option></select></div>
+          <div><label class="block text-xs font-semibold mb-1">Uang Harian (Rp/Hari) *</label><input id="tfUangHarian" type="number" min="0" class="w-full text-sm px-2 py-2 border rounded" placeholder="380000" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Penginapan Eselon II (Rp/Malam)</label><input id="tfHotelEselonII" type="number" min="0" class="w-full text-sm px-2 py-2 border rounded" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Penginapan Eselon III / Gol IV</label><input id="tfHotelEselonIII" type="number" min="0" class="w-full text-sm px-2 py-2 border rounded" placeholder="1900000" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Penginapan Eselon IV / Gol III</label><input id="tfHotelEselonIV" type="number" min="0" class="w-full text-sm px-2 py-2 border rounded" placeholder="816000" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Penginapan Gol II</label><input id="tfHotelGolII" type="number" min="0" class="w-full text-sm px-2 py-2 border rounded" /></div>
+          <div><label class="block text-xs font-semibold mb-1">Penginapan Non-ASN</label><input id="tfHotelNonASN" type="number" min="0" class="w-full text-sm px-2 py-2 border rounded" /></div>
+          <div class="md:col-span-4 flex flex-wrap justify-end gap-2">
+            <button type="button" onclick="clearTarifForm()" class="px-3 py-2 text-xs rounded border bg-white">Bersihkan</button>
+            <button type="button" onclick="saveTarifForm()" class="px-4 py-2 text-xs rounded bg-sky-600 text-white font-bold">Simpan Tarif</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto mt-4">
+          <table class="w-full text-left border-collapse text-xs min-w-[900px]">
+            <thead><tr class="bg-slate-800 text-white"><th class="p-2">No</th><th class="p-2">Tujuan</th><th class="p-2">Kategori</th><th class="p-2 text-right">Uang Harian</th><th class="p-2 text-right">Eselon II</th><th class="p-2 text-right">Eselon III/Gol IV</th><th class="p-2 text-right">Eselon IV/Gol III</th><th class="p-2 text-right">Gol II</th><th class="p-2 text-right">Non-ASN</th><th class="p-2">Aksi</th></tr></thead>
+            <tbody id="masterTarifBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+        <p class="text-[11px] text-slate-500 mt-2">Untuk tujuan yang belum ada dalam daftar, aplikasi menggunakan tarif uang harian bawaan kategori dan batas penginapan Rp0 sampai tarif tujuan ditambahkan. Lengkapi tarif sesuai ketentuan resmi yang berlaku.</p>
+      </div>
+
+      <!-- MASTER PEJABAT PENANDATANGAN -->
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Data Pejabat Penandatangan (ST, SPD & SPJ)</h2>
+            <p class="text-xs text-slate-500">Daftar pejabat yang muncul pada pilihan tanda tangan dokumen resmi.</p>
+          </div>
+          <button onclick="openPejabatModal()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-2 rounded-lg shadow-sm">
+            + Tambah Pejabat Penandatangan
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-sm">
+            <thead>
+              <tr class="bg-slate-800 text-white text-xs uppercase">
+                <th class="py-2.5 px-3">No</th>
+                <th class="py-2.5 px-3">Label / Atas Nama Jabatan</th>
+                <th class="py-2.5 px-3">Nama Pejabat</th>
+                <th class="py-2.5 px-3">Pangkat / Gol</th>
+                <th class="py-2.5 px-3">NIP</th>
+                <th class="py-2.5 px-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="masterPejabatBody" class="divide-y divide-slate-200"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 4: PRATINJAU & CETAK DOKUMEN RESMI                    -->
+    <!-- ========================================================= -->
+    <section id="tab-print" class="tab-section hidden space-y-4">
+      <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="text-xs font-semibold text-slate-700">Pilih Surat Tugas:</label>
+          <select id="printSelectST" onchange="renderPrintDocuments()" class="text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white min-w-[260px]"></select>
+
+          <label class="text-xs font-semibold text-slate-700 ml-2">Jenis Dokumen:</label>
+          <select id="printDocType" onchange="renderPrintDocuments()" class="text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white">
+            <option value="ALL">Semua Dokumen (ST + SPD + Rincian Biaya + Kwitansi)</option>
+            <option value="ST">1. Surat Tugas (ST) Saja</option>
+            <option value="SPD_FRONT">2. SPD Lembar Depan (Semua Personel)</option>
+            <option value="SPD_BACK">3. SPD Lembar Belakang (Pengesahan I-VIII)</option>
+            <option value="SPJ">4. Rincian Biaya Perjalanan Dinas (Per Personel)</option>
+            <option value="KWT">5. Kwitansi / Tanda Bukti Pembayaran (1 Perwakilan)</option>
+          </select>
+        </div>
+
+        <div class="w-full border-t border-slate-200 pt-3 mt-1 flex flex-wrap items-end gap-2">
+          <div>
+            <label for="printPaperSize" class="block text-[11px] font-semibold text-slate-600 mb-1">Ukuran Kertas</label>
+            <select id="printPaperSize" onchange="handlePrintPaperChange()" class="text-xs px-2.5 py-2 border border-slate-300 rounded-lg bg-white">
+              <option value="F4">F4 / Folio (215 × 330 mm)</option>
+              <option value="A4">A4 (210 × 297 mm)</option>
+              <option value="Letter">Letter (216 × 279 mm)</option>
+              <option value="Legal">Legal (216 × 356 mm)</option>
+              <option value="Custom">Manual / Kustom</option>
+            </select>
+          </div>
+          <div id="customPaperWrap" class="hidden flex items-end gap-2">
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Lebar (mm)</label><input id="printPaperWidth" type="number" min="50" max="500" value="215" class="w-20 text-xs px-2 py-2 border border-slate-300 rounded-lg" /></div>
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Tinggi (mm)</label><input id="printPaperHeight" type="number" min="50" max="600" value="330" class="w-20 text-xs px-2 py-2 border border-slate-300 rounded-lg" /></div>
+          </div>
+          <div class="flex items-end gap-1.5">
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Margin Atas</label><input id="printMarginTop" type="number" min="0" max="50" step="0.5" value="8" class="w-16 text-xs px-2 py-2 border border-slate-300 rounded-lg" /></div>
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Bawah</label><input id="printMarginBottom" type="number" min="0" max="50" step="0.5" value="8" class="w-16 text-xs px-2 py-2 border border-slate-300 rounded-lg" /></div>
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Kiri</label><input id="printMarginLeft" type="number" min="0" max="50" step="0.5" value="8" class="w-16 text-xs px-2 py-2 border border-slate-300 rounded-lg" /></div>
+            <div><label class="block text-[11px] font-semibold text-slate-600 mb-1">Kanan</label><input id="printMarginRight" type="number" min="0" max="50" step="0.5" value="8" class="w-16 text-xs px-2 py-2 border border-slate-300 rounded-lg" /></div>
+          </div>
+          <button type="button" onclick="savePrintSettings()" class="text-xs bg-slate-700 hover:bg-slate-800 text-white font-semibold px-3 py-2 rounded-lg">Simpan Pengaturan</button>
+          <button onclick="printWithSettings()" class="bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow flex items-center gap-2">
+            🖨️ Cetak / Simpan PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- AREA RENDER DOKUMEN CETAK -->
+      <div id="printArea" class="space-y-8">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TAB 5: PENGATURAN GOOGLE DRIVE API & SINKRONISASI CLOUD   -->
+    <!-- ========================================================= -->
+    <section id="tab-cloud" class="tab-section hidden space-y-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-4xl mx-auto space-y-6">
+        <div class="border-b border-slate-200 pb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <span>☁️ Integrasi Database Online Google Drive (Google Sheets)</span>
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">
+              Hubungkan aplikasi ini dengan Google Apps Script di Google Drive Anda agar seluruh data Surat Tugas, SPD, SPJ, dan Master Pegawai tersimpan online dan bisa diakses dari HP atau komputer mana saja.
+            </p>
+          </div>
+          <div id="cloudDetailBadge" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+            Status: Belum Terhubung
+          </div>
+        </div>
+
+        <!-- FORM URL GOOGLE APPS SCRIPT -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+          <div>
+            <label class="block text-sm font-bold text-slate-800 mb-1">URL Web App Google Apps Script (berakhiran /exec)</label>
+            <input type="url" id="cloudApiUrl" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono" />
+            <p class="text-[11px] text-slate-500 mt-1">Tempelkan URL hasil Deploy Web App dari Google Sheets <strong>Database_ESPPD_Bapenda_Lahat</strong> Anda.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <label class="flex items-center gap-2.5 cursor-pointer select-none">
+              <input type="checkbox" id="cloudAutoSync" class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500" checked />
+              <span class="text-sm font-medium text-slate-700">Aktifkan Sinkronisasi Otomatis (Tarik data saat aplikasi dibuka & simpan otomatis saat ada perubahan)</span>
+            </label>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-200">
+            <button type="button" onclick="saveCloudSettings()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow-sm transition">
+              💾 Simpan Pengaturan & Uji Koneksi
+            </button>
+            <button type="button" onclick="pullFromGDrive(true)" class="bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
+              ↓ Tarik Data dari Google Drive Sekarang
+            </button>
+            <button type="button" onclick="pushToGDrive(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-sm transition">
+              ↑ Unggah Semua Data Lokal ke Google Drive
+            </button>
+            <button type="button" onclick="disconnectCloud()" class="text-xs text-rose-600 hover:underline ml-auto">
+              Putuskan Koneksi URL
+            </button>
+          </div>
+
+          <div id="cloudLogBox" class="hidden text-xs p-3 rounded-lg bg-slate-900 text-emerald-300 font-mono"></div>
+        </div>
+
+        <!-- PANDUAN SINGKAT SETUP GOOGLE SHEETS & APPS SCRIPT -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-800">Panduan Setup Google Sheets & Kode Google Apps Script</h3>
+            <button type="button" onclick="copyAppsScriptCode()" class="text-xs bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded-lg font-medium">
+              📋 Salin Kode Apps Script
+            </button>
+          </div>
+          <ol class="list-decimal list-inside text-xs text-slate-600 space-y-1.5 bg-sky-50/60 p-4 rounded-xl border border-sky-100">
+            <li>Buat Google Spreadsheet baru di Google Drive dengan nama <strong>Database_ESPPD_Bapenda_Lahat</strong>.</li>
+            <li>Buat 4 tab sheet di bagian bawah dengan nama persis: <code class="bg-white px-1.5 py-0.5 rounded border">Data_ST</code>, <code class="bg-white px-1.5 py-0.5 rounded border">Master_Pegawai</code>, <code class="bg-white px-1.5 py-0.5 rounded border">Master_Pejabat</code>, dan <code class="bg-white px-1.5 py-0.5 rounded border">Master_Tarif</code>.</li>
+            <li>Buka menu <strong>Ekstensi (Extensions) &gt; Apps Script</strong>, hapus kode lama, lalu tempel kode di bawah ini.</li>
+            <li>Klik <strong>Terapkan (Deploy) &gt; Deployment baru</strong>, pilih jenis <strong>Aplikasi web</strong>, atur <em>Jalankan sebagai: Saya (Me)</em> dan <em>Yang memiliki akses: Siapa saja (Anyone)</em>.</li>
+            <li>Salin URL Web App yang muncul dan tempelkan pada kolom URL di atas.</li>
+          </ol>
+
+          <pre id="appsScriptSource" class="text-[11px] bg-slate-900 text-slate-100 p-4 rounded-xl overflow-x-auto leading-relaxed">function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : 'getAll';
+  if (action === 'getAll') {
+    const result = {
+      status: 'success',
+      stList: readSheetJson(getOrCreateSheet(ss, 'Data_ST')),
+      pegawaiList: readSheetJson(getOrCreateSheet(ss, 'Master_Pegawai')),
+      pejabatList: readSheetJson(getOrCreateSheet(ss, 'Master_Pejabat')),
+      tarifList: readSheetJson(getOrCreateSheet(ss, 'Master_Tarif'))
+    };
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doPost(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const payload = JSON.parse(e.postData.contents);
+  if (payload.action === 'syncAll') {
+    writeSheetJson(getOrCreateSheet(ss, 'Data_ST'), payload.stList, 'id');
+    writeSheetJson(getOrCreateSheet(ss, 'Master_Pegawai'), payload.pegawaiList, 'nip');
+    writeSheetJson(getOrCreateSheet(ss, 'Master_Pejabat'), payload.pejabatList, 'id');
+    writeSheetJson(getOrCreateSheet(ss, 'Master_Tarif'), payload.tarifList, 'id');
+    return ContentService.createTextOutput(JSON.stringify({
+      status: 'success',
+      message: 'Database Google Drive berhasil diperbarui',
+      timestamp: new Date().toISOString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getOrCreateSheet(ss, name) {
+  return ss.getSheetByName(name) || ss.insertSheet(name);
+}
+
+function readSheetJson(sheet) {
+  if (!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+  const values = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
+  const items = [];
+  for (let i = 0; i < values.length; i++) {
+    if (values[i][0]) {
+      try { items.push(JSON.parse(values[i][0])); } catch (err) {}
+    }
+  }
+  return items;
+}
+
+function writeSheetJson(sheet, dataArray, keyField) {
+  if (!sheet) return;
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, 3).setValues([['ID_KEY', 'JSON_DATA', 'UPDATE_TERAKHIR']]);
+  }
+  const lastRow = sheet.getLastRow();
+  if (lastRow >= 2) {
+    sheet.getRange(2, 1, lastRow - 1, 3).clearContent();
+  }
+  if (!dataArray || dataArray.length === 0) return;
+  const now = new Date().toLocaleString('id-ID');
+  const rows = dataArray.map(function(item) {
+    return [item[keyField] || '-', JSON.stringify(item), now];
+  });
+  sheet.getRange(2, 1, rows.length, 3).setValues(rows);
+}</pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MODAL TAMBAH / EDIT PEGAWAI                               -->
+  <!-- ========================================================= -->
+  <div id="modalPegawai" class="no-print fixed inset-0 bg-slate-900/60 z-40 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 id="modalPegawaiTitle" class="font-bold text-slate-900">Tambah Pegawai Baru</h3>
+        <button onclick="closePegawaiModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+      </div>
+      <input type="hidden" id="mpOldNip" value="" />
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
+          <input type="text" id="mpNama" placeholder="Contoh: Firman Yurdiansyah, SE, MM" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">NIP / NRP / NIPPPK *</label>
+          <input type="text" id="mpNip" placeholder="Contoh: 19780426 200701 1 004" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Pangkat / Golongan</label>
+          <input type="text" id="mpPangkat" placeholder="Contoh: Pembina (IV/a)" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Jabatan</label>
+          <input type="text" id="mpJabatan" placeholder="Contoh: Kabid Pajak Daerah dan Retribusi" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori pada SBU</label>
+            <select id="mpSbu" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white">
+              <option value="Eselon II">Eselon II</option>
+              <option value="Eselon III">Eselon III</option>
+              <option value="Gol IV">Gol IV</option>
+              <option value="Eselon IV">Eselon IV</option>
+              <option value="Gol III" selected>Gol III / ASN</option>
+              <option value="Gol II">Gol II / PPPK</option>
+              <option value="Non-ASN">Non-ASN / Tim Eksternal</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">NPWP</label>
+            <input type="text" id="mpNpwp" placeholder="160409..." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Bank Penerima</label>
+            <input type="text" id="mpBank" value="Sumsel Babel Cabang Lahat" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">No. Rekening</label>
+            <input type="text" id="mpNorek" placeholder="142010..." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t">
+        <button onclick="closePegawaiModal()" class="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-300 text-slate-600">Batal</button>
+        <button onclick="savePegawaiModal()" class="px-4 py-2 text-xs font-bold rounded-lg bg-sky-600 hover:bg-sky-700 text-white">Simpan Pegawai</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL TAMBAH / EDIT PEJABAT PENANDATANGAN                 -->
+  <!-- ========================================================= -->
+  <div id="modalPejabat" class="no-print fixed inset-0 bg-slate-900/60 z-40 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <h3 id="modalPejabatTitle" class="font-bold text-slate-900">Tambah Pejabat Penandatangan</h3>
+        <button onclick="closePejabatModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+      </div>
+      <input type="hidden" id="mpjId" value="" />
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Label Jabatan pada Dokumen *</label>
+          <textarea id="mpjLabel" rows="2" placeholder="Contoh: KEPALA BADAN PENDAPATAN DAERAH&#10;KABUPATEN LAHAT" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pejabat & Gelar *</label>
+          <input type="text" id="mpjNama" placeholder="Contoh: M. Ghufran D, S.E., M.M." class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Pangkat / Golongan</label>
+          <input type="text" id="mpjPangkat" placeholder="Contoh: PEMBINA TK. I (IV/b)" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">NIP</label>
+          <input type="text" id="mpjNip" placeholder="Contoh: 19821130 200501 1 003" class="w-full text-sm px-3 py-2 border border-slate-300 rounded-lg" />
+        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-3 border-t">
+        <button onclick="closePejabatModal()" class="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-300 text-slate-600">Batal</button>
+        <button onclick="savePejabatModal()" class="px-4 py-2 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Simpan Pejabat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT APPLICATION LOGIC                              -->
+  <!-- ========================================================= -->
+  <script>
+    // 1. DEFAULT MASTER DATA (DARI FILE EXCEL & WORD BAPENDA LAHAT)
+    const DEFAULT_PEGAWAI = [
+      { nip: "19780426 200701 1 004", nama: "Firman Yurdiansyah, SE, MM", pangkat: "Pembina (IV/a)", jabatan: "Kabid Pajak Daerah dan Retribusi", sbu: "Eselon III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19680823 200701 1 004", nama: "Agustian, S.H", pangkat: "Penata Tk. I (III/d)", jabatan: "Kasubbid Pelayanan dan Pendataan", sbu: "Eselon IV", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19721224 200801 1 001", nama: "Decki Melson, S.E., MM", pangkat: "Penata Tk. I (III/d)", jabatan: "Kasubbid Penetapan dan Penilaian", sbu: "Eselon IV", alamat: "Lahat", npwp: "1604092412720002", bank: "Sumsel Babel Cabang Lahat", norek: "1420107082" },
+      { nip: "19790123 200903 2 001", nama: "Yensi, S.E., M.M", pangkat: "Penata Tk. I (III/d)", jabatan: "Kasubbid Pelayanan dan Pendaftaran PBBP2 dan BPHTB", sbu: "Eselon IV", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19860703 200501 1 003", nama: "Prayuza Yusri, S.Mn", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Pajak", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19840201 200901 1 002", nama: "Febriansyah, S.E., M.Si", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Laporan Hasil Pengawasan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19710319 199403 1 002", nama: "Petran Darmadi, S.E", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Pendapatan Daerah", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19750519 200701 2 004", nama: "Mey Hastuti, S.E", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Pajak Daerah", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19820914 200801 1 002", nama: "Citra Ninggolan, S.E", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Bimbingan Pendataan, Penilaian dan Pengembangan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19811013 200701 1 001", nama: "Topan Akbar, S.E", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Monitoring dan Evaluasi Kebijakan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19770618 200701 1 002", nama: "Bambang Susanto, S.E", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Penagihan Pajak", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19690402 200112 2 001", nama: "Hj. Harnilah, S.E., MM", pangkat: "Pembina (IV/a)", jabatan: "Analis Perencanaan", sbu: "Eselon IV", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19840603 200501 1 002", nama: "Ramadhon, SAP", pangkat: "Penata Tk. I (III/d)", jabatan: "Analis Pajak dan Retribusi Daerah", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19750525 200801 1 008", nama: "Nurdini, S.E", pangkat: "Penata (III/c)", jabatan: "Analis Penagihan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19780108 200901 1 001", nama: "Alen Sarkis, S.E", pangkat: "Penata (III/c)", jabatan: "Analis Evaluasi Audit", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19850421 201001 2 005", nama: "Santi Sulistiana, S.E", pangkat: "Penata (III/c)", jabatan: "Analis Aplikasi Pengelolaan Data Sistem Keuangan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19770227 201001 1 001", nama: "Pidi Adriansyah, S.E", pangkat: "Penata (III/c)", jabatan: "Analis Rencana Program Kegiatan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19820811 200801 1 002", nama: "Deni Yuanda, SAP", pangkat: "Penata Muda (III/a)", jabatan: "Analis Pelayanan Publik", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19750412 200901 1 003", nama: "Elqodri Afrizal, SAP", pangkat: "Penata Muda (III/a)", jabatan: "Analis Monitoring Evaluasi dan Pelaporan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19791209 200701 1 013", nama: "Subianto", pangkat: "Penata Muda (III/a)", jabatan: "Pengelola Program dan Kegiatan", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19800805 201408 2 003", nama: "Rina Sartika, A.Md", pangkat: "Penata Muda (III/a)", jabatan: "Bendahara Pengeluaran", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19760620 200701 2 010", nama: "Yuni Maryani", pangkat: "Penata Muda (III/a)", jabatan: "Operator Layanan Operasional", sbu: "Gol III", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19690312 200901 1 001", nama: "Hermansyah", pangkat: "Pengatur Tk. I (II/d)", jabatan: "Pengelola Pendataan", sbu: "Gol II", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19940224 202421 1 004", nama: "M. Ridwan", pangkat: "Pengatur (II/c)", jabatan: "Pranata Komputer", sbu: "Gol II", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19960502 202521 1 015", nama: "Bayu Hadisaputra", pangkat: "PPPK / V", jabatan: "Operator Layanan Operasional", sbu: "Gol II", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19900130 202521 1 099", nama: "Riki Trisyah Putra", pangkat: "PPPK / V", jabatan: "Operator Layanan Operasional", sbu: "Gol II", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19980530 202521 1 006", nama: "KMS Edo Fernanda", pangkat: "PPPK / V", jabatan: "Pengadministrasi Perkantoran", sbu: "Gol II", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" },
+      { nip: "19870814 202521 1 089", nama: "Ahmad Gusanto", pangkat: "PPPK Paruh Waktu", jabatan: "Operator Layanan Operasional", sbu: "Gol II", alamat: "Lahat", npwp: "", bank: "Sumsel Babel Cabang Lahat", norek: "" }
+    ];
+
+    const DEFAULT_PEJABAT = [
+      { id: "pj-1", label: "KEPALA BADAN PENDAPATAN DAERAH\nKABUPATEN LAHAT", nama: "M. Ghufran D, S.E., M.M.", pangkat: "PEMBINA TK. I (IV/b)", nip: "19821130 200501 1 003" },
+      { id: "pj-2", label: "Plt. KEPALA BADAN PENDAPATAN DAERAH\nKABUPATEN LAHAT", nama: "H. APRIANSYAH, SE., MM.", pangkat: "PEMBINA TK. I (IV/b)", nip: "19760404 200701 1 008" },
+      { id: "pj-3", label: "KEPALA BADAN PENDAPATAN DAERAH\nKABUPATEN LAHAT", nama: "SUBRANUDIN, SE, MAP", pangkat: "PEMBINA UTAMA MUDA (IV/c)", nip: "19701015 199203 1 005" },
+      { id: "pj-4", label: "a.n KEPALA BADAN PENDAPATAN DAERAH\nKABUPATEN LAHAT\nKABID PAJAK DAERAH DAN RETRIBUSI", nama: "Firman Yurdiansyah, SE, MM", pangkat: "Pembina (IV/a)", nip: "19780426 200701 1 004" },
+      { id: "pj-5", label: "a.n KEPALA BADAN PENDAPATAN DAERAH\nu.b KABID PAJAK DAERAH DAN RETRIBUSI\nKASUBBID PELAYANAN DAN PENDATAAN", nama: "AGUSTIAN, S.H", pangkat: "PENATA TK. I (III/d)", nip: "19680823 200701 1 004" },
+      { id: "pj-6", label: "BENDAHARA PENGELUARAN\nBAPENDA KABUPATEN LAHAT", nama: "Rina Sartika, A.Md", pangkat: "Penata Muda (III/a)", nip: "19800805 201408 2 003" }
+    ];
+
+    const SAMPLE_ST = [
+      {
+        id: "st-sample-1",
+        kategori: "Luar Daerah (Dalam Provinsi)",
+        noST: "900/1427/Bapenda/III/2026",
+        noSPDBase: "090/1239/SPD/Bapenda/III/2026",
+        jenisPerjadin: "Perjalanan Dinas Biasa",
+        tglST: "2026-05-28",
+        tglBerangkat: "2026-05-28",
+        tglKembali: "2026-05-30",
+        lamaHari: 3,
+        asal: "Lahat",
+        tujuanInstansi: "Gedung Kantor BPK-RI Perwakilan Sumatera Selatan",
+        tujuanKota: "Palembang",
+        tujuanProv: "Sumatera Selatan",
+        mataAnggaran: "5.1.02.04.01.0001",
+        dasar: "Hasil Audit Badan Pemeriksa Keuangan (BPK) RI atas LKPD Kabupaten Lahat TA 2025",
+        alatAngkut: "Angkutan Darat",
+        maksud: "Mengikuti Action Plan Tindak Lanjut hasil Audit Badan Pemeriksa Keuangan (BPK) RI atas LKPD Kabupaten Lahat TA 2025 di Gedung Kantor BPK-RI Perwakilan Sumatera Selatan",
+        ttdST: "pj-1",
+        ttdSPD: "pj-1",
+        ttdBendahara: "pj-6",
+        personel: [
+          {
+            noSPD: "090/1239a/SPD/Bapenda/III/2026",
+            nama: "Firman Yurdiansyah, SE, MM",
+            nip: "19780426 200701 1 004",
+            pangkat: "Pembina (IV/a)",
+            jabatan: "Kabid Pajak Daerah dan Retribusi",
+            sbu: "Eselon III",
+            uhPerHari: 380000, uhHari: 3,
+            bimtekPerHari: 0, bimtekHari: 0,
+            repPerHari: 0, repHari: 0,
+            hotelNama: "-", hotelKamar: "-", hotelFolio: "-", hotelPerMalam: 0, hotelMalam: 0, ambil30Persen: "Ya", hotelTotal: 942600,
+            taksiTotal: 0,
+            daratJenis: "Pribadi", daratPlat: "BG 1042 ZH", daratTotal: 0,
+            udaraMaskapai: "", udaraBooking: "", udaraTotal: 0,
+            airTotal: 0
+          },
+          {
+            noSPD: "090/1239b/SPD/Bapenda/III/2026",
+            nama: "Prayuza Yusri, S.Mn",
+            nip: "19860703 200501 1 003",
+            pangkat: "Penata Tk. I (III/d)",
+            jabatan: "Analis Pajak",
+            sbu: "Gol III",
+            uhPerHari: 380000, uhHari: 3,
+            bimtekPerHari: 0, bimtekHari: 0,
+            repPerHari: 0, repHari: 0,
+            hotelNama: "-", hotelKamar: "-", hotelFolio: "-", hotelPerMalam: 0, hotelMalam: 0, ambil30Persen: "Ya", hotelTotal: 516600,
+            taksiTotal: 0,
+            daratJenis: "Pribadi", daratPlat: "BG 1042 ZH", daratTotal: 0,
+            udaraMaskapai: "", udaraBooking: "", udaraTotal: 0,
+            airTotal: 0
+          },
+          {
+            noSPD: "090/1239c/SPD/Bapenda/III/2026",
+            nama: "Febriansyah, S.E., M.Si",
+            nip: "19840201 200901 1 002",
+            pangkat: "Penata Tk. I (III/d)",
+            jabatan: "Analis Laporan Hasil Pengawasan",
+            sbu: "Gol III",
+            uhPerHari: 380000, uhHari: 3,
+            bimtekPerHari: 0, bimtekHari: 0,
+            repPerHari: 0, repHari: 0,
+            hotelNama: "-", hotelKamar: "-", hotelFolio: "-", hotelPerMalam: 0, hotelMalam: 0, ambil30Persen: "Ya", hotelTotal: 516600,
+            taksiTotal: 0,
+            daratJenis: "Pribadi", daratPlat: "BG 1042 ZH", daratTotal: 0,
+            udaraMaskapai: "", udaraBooking: "", udaraTotal: 0,
+            airTotal: 0
+          }
+        ]
+      },
+      {
+        id: "st-sample-2",
+        kategori: "Dalam Daerah",
+        noST: "900/184/Bapenda/III/2026",
+        noSPDBase: "090/186/SPD/Bapenda/III/2026",
+        jenisPerjadin: "Perjalanan Dinas Biasa",
+        tglST: "2026-01-19",
+        tglBerangkat: "2026-01-20",
+        tglKembali: "2026-01-22",
+        lamaHari: 3,
+        asal: "Lahat",
+        tujuanInstansi: "Wajib Pajak PBJT Jasa Perhotelan Wilayah I",
+        tujuanKota: "Lahat",
+        tujuanProv: "Sumatera Selatan",
+        mataAnggaran: "5.1.02.04.01.0001",
+        dasar: "Peraturan Daerah Kabupaten Lahat Nomor 1 tahun 2024 tentang Pajak Daerah dan Retribusi Daerah",
+        alatAngkut: "Angkutan Darat",
+        maksud: "Melaksanakan Pendataan dan Penyampaian SPTPD Pajak Barang dan Jasa Tertentu (PBJT) Jasa Perhotelan di Wilayah I Kabupaten Lahat",
+        ttdST: "pj-4",
+        ttdSPD: "pj-1",
+        ttdBendahara: "pj-6",
+        personel: [
+          {
+            noSPD: "090/186/SPD/Bapenda/III/2026",
+            nama: "Bambang Susanto, S.E",
+            nip: "19770618 200701 1 002",
+            pangkat: "Penata Tk. I (III/d)",
+            jabatan: "Analis Penagihan Pajak",
+            sbu: "Gol III",
+            uhPerHari: 150000, uhHari: 3,
+            bimtekPerHari: 0, bimtekHari: 0,
+            repPerHari: 0, repHari: 0,
+            hotelNama: "", hotelKamar: "", hotelFolio: "", hotelPerMalam: 0, hotelMalam: 0, ambil30Persen: "Tidak", hotelTotal: 0,
+            taksiTotal: 0,
+            daratJenis: "Pribadi", daratPlat: "", daratTotal: 0,
+            udaraMaskapai: "", udaraBooking: "", udaraTotal: 0,
+            airTotal: 0
+          }
+        ]
+      }
+    ];
+
+    // MASTER TARIF DEFAULT: hanya contoh Palembang dari nilai yang diberikan pengguna.
+    const DEFAULT_TARIF = [
+      { id: "tarif-palembang-provinsi", kota: "Palembang", provinsi: "Sumatera Selatan", kategori: "Luar Daerah (Dalam Provinsi)", uangHarian: 380000, hotelEselonII: 0, hotelEselonIII: 1900000, hotelEselonIV: 816000, hotelGolII: 0, hotelNonASN: 0 }
+    ];
+
+    // STATE APPLICATION
+    let pegawaiList = [];
+    let pejabatList = [];
+    let tarifList = [];
+    let stList = [];
+    let cloudConfig = {
+      url: "",
+      autoSync: true,
+      lastSync: ""
+    };
+
+    // INIT ON LOAD
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadLocalState();
+      populatePejabatSelects();
+      renderMasterTables();
+      renderDashboard();
+      updateCloudStatusUI();
+
+      // Jika URL Cloud sudah dikonfigurasi & autoSync aktif, tarik data terbaru dari Google Drive
+      if (cloudConfig.url && cloudConfig.autoSync) {
+        await pullFromGDrive(false);
+      }
+    });
+
+    function loadLocalState() {
+      const savedPegawai = localStorage.getItem('esppd_pegawai_v2');
+      const savedPejabat = localStorage.getItem('esppd_pejabat_v2');
+      const savedTarif = localStorage.getItem('esppd_tarif_v1');
+      const savedST = localStorage.getItem('esppd_st_v2');
+      const savedCloud = localStorage.getItem('esppd_cloud_cfg_v1');
+
+      pegawaiList = savedPegawai ? JSON.parse(savedPegawai) : JSON.parse(JSON.stringify(DEFAULT_PEGAWAI));
+      pejabatList = savedPejabat ? JSON.parse(savedPejabat) : JSON.parse(JSON.stringify(DEFAULT_PEJABAT));
+      tarifList = savedTarif ? JSON.parse(savedTarif) : JSON.parse(JSON.stringify(DEFAULT_TARIF));
+      stList = savedST ? JSON.parse(savedST) : JSON.parse(JSON.stringify(SAMPLE_ST));
+      if (savedCloud) {
+        cloudConfig = JSON.parse(savedCloud);
+      }
+      document.getElementById('cloudApiUrl').value = cloudConfig.url || "";
+      document.getElementById('cloudAutoSync').checked = cloudConfig.autoSync !== false;
+    }
+
+    function saveLocalState(triggerCloud = true) {
+      localStorage.setItem('esppd_pegawai_v2', JSON.stringify(pegawaiList));
+      localStorage.setItem('esppd_pejabat_v2', JSON.stringify(pejabatList));
+      localStorage.setItem('esppd_tarif_v1', JSON.stringify(tarifList));
+      localStorage.setItem('esppd_st_v2', JSON.stringify(stList));
+
+      if (triggerCloud && cloudConfig.url && cloudConfig.autoSync) {
+        pushToGDrive(false);
+      }
+    }
+
+    // =========================================================
+    // GOOGLE DRIVE (GOOGLE SHEETS APPS SCRIPT) SYNC ENGINE
+    // =========================================================
+    function updateCloudStatusUI(syncingState = null) {
+      const badge = document.getElementById('cloudStatusBadge');
+      const dot = document.getElementById('cloudStatusDot');
+      const text = document.getElementById('cloudStatusText');
+      const detailBadge = document.getElementById('cloudDetailBadge');
+      const kpiInfo = document.getElementById('kpiCloudInfo');
+
+      if (syncingState === 'syncing') {
+        dot.className = "w-2 h-2 rounded-full bg-sky-400 animate-ping";
+        text.textContent = "Menyinkronkan GDrive...";
+        if (detailBadge) {
+          detailBadge.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 text-sky-800 border border-sky-200";
+          detailBadge.textContent = "Status: Sedang menyinkronkan...";
+        }
+        return;
+      }
+
+      if (cloudConfig.url) {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+        text.textContent = "Terhubung GDrive";
+        badge.className = "cursor-pointer text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 hover:bg-emerald-900 transition flex items-center gap-1.5";
+        if (detailBadge) {
+          detailBadge.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200";
+          detailBadge.textContent = "Status: Terhubung (" + (cloudConfig.lastSync || "Siap") + ")";
+        }
+        if (kpiInfo) {
+          kpiInfo.textContent = "Terhubung • Terakhir: " + (cloudConfig.lastSync || "Baru saja");
+        }
+      } else {
+        dot.className = "w-2 h-2 rounded-full bg-amber-400";
+        text.textContent = "Mode Lokal (Offline)";
+        badge.className = "cursor-pointer text-[11px] px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-700 transition flex items-center gap-1.5";
+        if (detailBadge) {
+          detailBadge.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200";
+          detailBadge.textContent = "Status: Belum Terhubung (Mode Lokal)";
+        }
+        if (kpiInfo) {
+          kpiInfo.textContent = "Belum terhubung ke Google Sheets";
+        }
+      }
+    }
+
+    function logCloud(msg) {
+      const box = document.getElementById('cloudLogBox');
+      if (!box) return;
+      box.classList.remove('hidden');
+      const now = new Date().toLocaleTimeString('id-ID');
+      box.textContent = "[" + now + "] " + msg;
+    }
+
+    async function saveCloudSettings() {
+      const url = document.getElementById('cloudApiUrl').value.trim();
+      const autoSync = document.getElementById('cloudAutoSync').checked;
+      if (!url) {
+        showToast("Masukkan URL Web App Google Apps Script terlebih dahulu!", "⚠️");
+        return;
+      }
+      if (!url.startsWith("https://script.google.com/")) {
+        showToast("Format URL harus diawali https://script.google.com/...", "⚠️");
+        return;
+      }
+      cloudConfig.url = url;
+      cloudConfig.autoSync = autoSync;
+      localStorage.setItem('esppd_cloud_cfg_v1', JSON.stringify(cloudConfig));
+      updateCloudStatusUI();
+      await pullFromGDrive(true);
+    }
+
+    function disconnectCloud() {
+      if (!confirm("Putuskan koneksi URL Google Drive? Data lokal di browser ini tetap aman.")) return;
+      cloudConfig.url = "";
+      cloudConfig.lastSync = "";
+      localStorage.setItem('esppd_cloud_cfg_v1', JSON.stringify(cloudConfig));
+      document.getElementById('cloudApiUrl').value = "";
+      updateCloudStatusUI();
+      logCloud("Koneksi Google Drive diputuskan. Aplikasi berjalan dalam mode lokal.");
+      showToast("Koneksi Google Drive diputuskan", "ℹ️");
+    }
+
+    async function pullFromGDrive(showAlert = true) {
+      if (!cloudConfig.url) {
+        if (showAlert) {
+          showToast("Atur URL Google Drive API terlebih dahulu di menu Pengaturan GDrive.", "⚠️");
+          switchTab('cloud');
+        }
+        return;
+      }
+      updateCloudStatusUI('syncing');
+      logCloud("Menarik data dari Google Sheets...");
+      try {
+        const sep = cloudConfig.url.includes('?') ? '&' : '?';
+        const resp = await fetch(cloudConfig.url + sep + "action=getAll&t=" + Date.now());
+        const data = await resp.json();
+        if (data && data.status === 'success') {
+          let updated = false;
+          const tarifSheetKosong = !Array.isArray(data.tarifList) || data.tarifList.length === 0;
+          if (Array.isArray(data.stList) && data.stList.length > 0) {
+            stList = data.stList;
+            updated = true;
+          }
+          if (Array.isArray(data.pegawaiList) && data.pegawaiList.length > 0) {
+            pegawaiList = data.pegawaiList;
+            updated = true;
+          }
+          if (Array.isArray(data.pejabatList) && data.pejabatList.length > 0) {
+            pejabatList = data.pejabatList;
+            updated = true;
+          }
+          if (Array.isArray(data.tarifList) && data.tarifList.length > 0) {
+            tarifList = data.tarifList;
+            updated = true;
+          }
+
+          cloudConfig.lastSync = new Date().toLocaleTimeString('id-ID');
+          localStorage.setItem('esppd_cloud_cfg_v1', JSON.stringify(cloudConfig));
+
+          if (updated) {
+            localStorage.setItem('esppd_pegawai_v2', JSON.stringify(pegawaiList));
+            localStorage.setItem('esppd_pejabat_v2', JSON.stringify(pejabatList));
+            localStorage.setItem('esppd_tarif_v1', JSON.stringify(tarifList));
+            localStorage.setItem('esppd_st_v2', JSON.stringify(stList));
+            populatePejabatSelects();
+            renderMasterTables();
+            renderDashboard();
+            logCloud("Berhasil memuat " + stList.length + " ST & " + pegawaiList.length + " Pegawai dari Google Drive.");
+            if (showAlert) showToast("Data berhasil ditarik dari Google Drive!", "☁️");
+            if (tarifSheetKosong && tarifList.length > 0) {
+              logCloud("Mengisi Master_Tarif baru dari tarif lokal aplikasi...");
+              await pushToGDrive(false);
+            }
+          } else {
+            logCloud("Terhubung ke Google Sheets, namun sheet masih kosong. Mengunggah data awal...");
+            await pushToGDrive(showAlert);
+          }
+        } else {
+          throw new Error("Respons tidak valid dari Apps Script");
+        }
+      } catch (err) {
+        logCloud("Gagal menarik data: " + err.message);
+        if (showAlert) showToast("Gagal terhubung ke Google Drive. Periksa izin 'Anyone' pada Apps Script.", "❌");
+      } finally {
+        updateCloudStatusUI();
+      }
+    }
+
+    async function pushToGDrive(showAlert = true) {
+      if (!cloudConfig.url) {
+        if (showAlert) {
+          showToast("Atur URL Google Drive API terlebih dahulu di menu Pengaturan GDrive.", "⚠️");
+          switchTab('cloud');
+        }
+        return;
+      }
+      updateCloudStatusUI('syncing');
+      logCloud("Mengirim pembaruan database ke Google Drive...");
+      try {
+        const payload = {
+          action: "syncAll",
+          stList: stList,
+          pegawaiList: pegawaiList,
+          pejabatList: pejabatList,
+          tarifList: tarifList
+        };
+        const resp = await fetch(cloudConfig.url, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const res = await resp.json();
+        if (res && res.status === "success") {
+          cloudConfig.lastSync = new Date().toLocaleTimeString('id-ID');
+          localStorage.setItem('esppd_cloud_cfg_v1', JSON.stringify(cloudConfig));
+          logCloud("Sukses sinkronisasi ke Google Sheets (" + stList.length + " ST, " + pegawaiList.length + " Pegawai, " + tarifList.length + " Tarif).");
+          if (showAlert) showToast("Database berhasil disimpan ke Google Drive!", "☁️");
+        } else {
+          throw new Error("Gagal menyimpan ke sheet");
+        }
+      } catch (err) {
+        logCloud("Gagal mengirim data ke GDrive: " + err.message);
+        if (showAlert) showToast("Gagal sinkronisasi ke Google Drive: " + err.message, "❌");
+      } finally {
+        updateCloudStatusUI();
+      }
+    }
+
+    function copyAppsScriptCode() {
+      const code = document.getElementById('appsScriptSource').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast("Kode Google Apps Script berhasil disalin!", "📋");
+      });
+    }
+
+    // =========================================================
+    // NAVIGATION & UI HELPERS
+    // =========================================================
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-600', 'text-white');
+        if (btn.id === 'tabBtn-cloud') {
+          btn.classList.add('text-emerald-300');
+        } else {
+          btn.classList.add('text-slate-300');
+        }
+      });
+
+      document.getElementById('tab-' + tabName).classList.remove('hidden');
+      const activeBtn = document.getElementById('tabBtn-' + tabName);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-300', 'text-emerald-300');
+        activeBtn.classList.add('bg-sky-600', 'text-white');
+      }
+
+      if (tabName === 'print') {
+        populatePrintSelect();
+        renderPrintDocuments();
+      }
+    }
+
+    function showToast(msg, icon = "✅") {
+      const box = document.getElementById('toastBox');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMessage').textContent = msg;
+      box.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 3500);
+    }
+
+    function formatRupiah(num) {
+      const n = Number(num) || 0;
+      return "Rp " + n.toLocaleString('id-ID');
+    }
+
+    function formatTanggalIndo(dateStr) {
+      if (!dateStr) return "-";
+      const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return dateStr;
+      const d = parseInt(parts[2], 10);
+      const m = months[parseInt(parts[1], 10) - 1] || parts[1];
+      return d + " " + m + " " + parts[0];
+    }
+
+    function terbilang(angka) {
+      angka = Math.floor(Math.abs(Number(angka) || 0));
+      if (angka === 0) return "Nol Rupiah";
+      const bil = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+      function toWords(n) {
+        if (n < 12) return bil[n];
+        if (n < 20) return toWords(n - 10) + " Belas";
+        if (n < 100) return toWords(Math.floor(n / 10)) + " Puluh " + toWords(n % 10);
+        if (n < 200) return "Seratus " + toWords(n - 100);
+        if (n < 1000) return toWords(Math.floor(n / 100)) + " Ratus " + toWords(n % 100);
+        if (n < 2000) return "Seribu " + toWords(n - 1000);
+        if (n < 1000000) return toWords(Math.floor(n / 1000)) + " Ribu " + toWords(n % 1000);
+        if (n < 1000000000) return toWords(Math.floor(n / 1000000)) + " Juta " + toWords(n % 1000000);
+        return toWords(Math.floor(n / 1000000000)) + " Miliar " + toWords(n % 1000000000);
+      }
+      return toWords(angka).replace(/\s+/g, " ").trim() + " Rupiah";
+    }
+
+    function calcPersonelTotal(p) {
+      const uh = (Number(p.uhPerHari) || 0) * (Number(p.uhHari) || 0);
+      const bimtek = (Number(p.bimtekPerHari) || 0) * (Number(p.bimtekHari) || 0);
+      const rep = (Number(p.repPerHari) || 0) * (Number(p.repHari) || 0);
+      const hotel = Number(p.hotelTotal) || 0;
+      const taksi = Number(p.taksiTotal) || 0;
+      const darat = Number(p.daratTotal) || 0;
+      const udara = Number(p.udaraTotal) || 0;
+      const air = Number(p.kapalTotal ?? p.airTotal) || 0;
+      const toll = Number(p.tollTotal) || 0;
+      const biayaLain = Number(p.biayaLainTotal) || 0;
+      return uh + bimtek + rep + hotel + taksi + darat + udara + air + toll + biayaLain;
+    }
+
+    function calcSTTotal(st) {
+      return (st.personel || []).reduce((sum, p) => sum + calcPersonelTotal(p), 0);
+    }
+
+    // =========================================================
+    // DASHBOARD & REKAP RENDERING
+    // =========================================================
+    function renderDashboard() {
+      const search = (document.getElementById('filterSearch').value || "").toLowerCase();
+      const kat = document.getElementById('filterKategori').value;
+      const bln = document.getElementById('filterBulan').value;
+
+      let totalSPD = 0;
+      let totalBiayaAll = 0;
+
+      const filtered = stList.filter(st => {
+        totalSPD += (st.personel || []).length;
+        totalBiayaAll += calcSTTotal(st);
+
+        if (kat !== "ALL" && st.kategori !== kat) return false;
+        if (bln !== "ALL" && (!st.tglBerangkat || st.tglBerangkat.split("-")[1] !== bln)) return false;
+
+        if (search) {
+          const persNames = (st.personel || []).map(p => p.nama + " " + p.nip + " " + p.noSPD).join(" ").toLowerCase();
+          const hay = (st.noST + " " + st.maksud + " " + st.tujuanInstansi + " " + st.tujuanKota + " " + persNames).toLowerCase();
+          if (!hay.includes(search)) return false;
+        }
+        return true;
+      });
+
+      document.getElementById('kpiTotalST').textContent = stList.length;
+      document.getElementById('kpiTotalSPD').textContent = totalSPD;
+      document.getElementById('kpiTotalBiaya').textContent = formatRupiah(totalBiayaAll);
+
+      const tbody = document.getElementById('rekapTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">Belum ada data Surat Tugas yang sesuai filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((st, idx) => {
+        const stTotal = calcSTTotal(st);
+        const badgeColor = st.kategori === "Dalam Daerah"
+          ? "bg-amber-100 text-amber-800 border-amber-200"
+          : st.kategori === "Luar Daerah (Dalam Provinsi)"
+            ? "bg-sky-100 text-sky-800 border-sky-200"
+            : "bg-purple-100 text-purple-800 border-purple-200";
+
+        const personelBadges = (st.personel || []).map(p =>
+          '<div class="text-xs py-0.5"><span class="font-semibold text-slate-800">' + p.nama + '</span> <span class="text-slate-500">(' + (p.noSPD || 'Belum ada No. SPD') + ')</span></div>'
+        ).join("");
+
+        return '<tr class="hover:bg-slate-50 transition">' +
+          '<td class="py-3 px-4 font-semibold text-slate-600">' + (idx + 1) + '</td>' +
+          '<td class="py-3 px-4">' +
+            '<div class="font-bold text-slate-900">' + (st.noST ? st.noST : '<span class="text-amber-600 italic font-semibold">(Belum ada No. ST)</span>') + '</div>' +
+            '<span class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded border ' + badgeColor + '">' + st.kategori + '</span>' +
+          '</td>' +
+          '<td class="py-3 px-4 max-w-xs">' +
+            '<div class="font-medium text-slate-800 line-clamp-2">' + st.maksud + '</div>' +
+            '<div class="text-xs text-slate-500 mt-1">Tujuan: ' + st.tujuanInstansi + ' (' + st.tujuanKota + ')</div>' +
+          '</td>' +
+          '<td class="py-3 px-4 whitespace-nowrap text-xs">' +
+            '<div>' + formatTanggalIndo(st.tglBerangkat) + '</div>' +
+            '<div class="text-slate-500">s.d. ' + formatTanggalIndo(st.tglKembali) + '</div>' +
+            '<div class="font-semibold text-sky-700 mt-0.5">' + st.lamaHari + ' Hari</div>' +
+          '</td>' +
+          '<td class="py-3 px-4">' + personelBadges + '</td>' +
+          '<td class="py-3 px-4 text-right font-bold text-emerald-700 whitespace-nowrap">' + formatRupiah(stTotal) + '</td>' +
+          '<td class="py-3 px-4 text-center whitespace-nowrap space-x-1">' +
+            '<button onclick="quickPrintST(\'' + st.id + '\')" class="px-2.5 py-1.5 text-xs bg-sky-600 hover:bg-sky-700 text-white rounded font-semibold" title="Cetak ST, SPD & SPJ">🖨️ Cetak</button>' +
+            '<button onclick="editST(\'' + st.id + '\')" class="px-2.5 py-1.5 text-xs bg-amber-500 hover:bg-amber-600 text-white rounded font-semibold" title="Edit Data">✏️ Edit</button>' +
+            '<button onclick="deleteST(\'' + st.id + '\')" class="px-2 py-1.5 text-xs bg-rose-600 hover:bg-rose-700 text-white rounded font-semibold" title="Hapus">🗑️</button>' +
+          '</td>' +
+        '</tr>';
+      }).join("");
+    }
+
+    function exportRekapCSV() {
+      const headers = [
+        "No", "Kategori Perjadin", "Nomor ST", "Nomor SPD", "Tanggal ST",
+        "Nama Pegawai", "NIP", "Pangkat/Gol", "Jabatan", "Kategori SBU",
+        "Kegiatan", "Tujuan Instansi", "Kota Tujuan", "Tgl Berangkat", "Tgl Kembali", "Lama (Hari)",
+        "Uang Harian Total", "Uang Diklat Total", "Representasi Total", "Penginapan Total",
+        "Taksi Total", "Transport Darat Total", "Transport Pesawat Total", "Transport Kapal Total", "Biaya Tol Total", "Biaya Lain-lain Total", "Total SPJ (Rp)"
+      ];
+
+      const rows = [headers.join(",")];
+      let counter = 1;
+      stList.forEach(st => {
+        (st.personel || []).forEach(p => {
+          const uh = (Number(p.uhPerHari) || 0) * (Number(p.uhHari) || 0);
+          const bimtek = (Number(p.bimtekPerHari) || 0) * (Number(p.bimtekHari) || 0);
+          const rep = (Number(p.repPerHari) || 0) * (Number(p.repHari) || 0);
+          const tot = calcPersonelTotal(p);
+
+          const cols = [
+            counter++,
+            '"' + (st.kategori || "") + '"',
+            '"' + (st.noST || "(Belum bernomor)") + '"',
+            '"' + (p.noSPD || "(Belum bernomor)") + '"',
+            '"' + (st.tglST || "") + '"',
+            '"' + (p.nama || "") + '"',
+            '"\'' + (p.nip || "") + '"',
+            '"' + (p.pangkat || "") + '"',
+            '"' + (p.jabatan || "") + '"',
+            '"' + (p.sbu || "") + '"',
+            '"' + (st.maksud || "").replace(/"/g, '""') + '"',
+            '"' + (st.tujuanInstansi || "").replace(/"/g, '""') + '"',
+            '"' + (st.tujuanKota || "") + '"',
+            '"' + (st.tglBerangkat || "") + '"',
+            '"' + (st.tglKembali || "") + '"',
+            st.lamaHari || 1,
+            uh, bimtek, rep,
+            Number(p.hotelTotal) || 0,
+            Number(p.taksiTotal) || 0,
+            Number(p.daratTotal) || 0,
+            Number(p.udaraTotal) || 0,
+            Number(p.kapalTotal ?? p.airTotal) || 0,
+            Number(p.tollTotal) || 0,
+            Number(p.biayaLainTotal) || 0,
+            tot
+          ];
+          rows.push(cols.join(","));
+        });
+      });
+
+      const blob = new Blob(["\uFEFF" + rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Rekap_SPJ_Perjadin_Bapenda_Lahat_" + new Date().toISOString().slice(0, 10) + ".csv";
+      link.click();
+      showToast("File Rekap CSV berhasil diunduh!", "📊");
+    }
+
+    // =========================================================
+    // FORM INPUT & EDIT ST / SPD
+    // =========================================================
+    function populatePejabatSelects() {
+      const selects = ['fTtdST', 'fTtdSPD', 'fTtdPPTK', 'fTtdBendahara'];
+      selects.forEach(selId => {
+        const el = document.getElementById(selId);
+        if (!el) return;
+        el.innerHTML = pejabatList.map(pj =>
+          '<option value="' + pj.id + '">' + pj.nama + ' (' + pj.label.split("\n")[0] + ')</option>'
+        ).join("");
+      });
+      if (document.getElementById('fTtdST')) document.getElementById('fTtdST').value = "pj-4";
+      if (document.getElementById('fTtdSPD')) document.getElementById('fTtdSPD').value = "pj-2";
+      if (document.getElementById('fTtdPPTK')) document.getElementById('fTtdPPTK').value = "pj-4";
+      if (document.getElementById('fTtdBendahara')) document.getElementById('fTtdBendahara').value = "pj-6";
+    }
+
+
+    function refreshPenerimaKwitansiOptions(selectedIdx = null) {
+      const sel = document.getElementById('fPenerimaKwitansiIdx');
+      if (!sel) return;
+      const prevVal = selectedIdx !== null ? String(selectedIdx) : sel.value;
+      const cards = Array.from(document.querySelectorAll('.personel-card'));
+      sel.innerHTML = cards.map((c, idx) => {
+        const nm = c.querySelector('.p-nama').value.trim() || ('Personel #' + (idx + 1));
+        return '<option value="' + idx + '">Personel #' + (idx + 1) + ' — ' + nm + '</option>';
+      }).join("");
+      if (prevVal && Number(prevVal) < cards.length) {
+        sel.value = prevVal;
+      } else {
+        sel.value = "0";
+      }
+      onChangePenerimaKwitansi();
+    }
+
+    function onChangePenerimaKwitansi() {
+      const sel = document.getElementById('fPenerimaKwitansiIdx');
+      if (!sel) return;
+      const idx = Number(sel.value) || 0;
+      const cards = Array.from(document.querySelectorAll('.personel-card'));
+      if (!cards[idx]) return;
+      const nip = cards[idx].querySelector('.p-nip').value.trim();
+      const pg = pegawaiList.find(x => x.nip === nip);
+      if (pg) {
+        document.getElementById('fKwtNpwp').value = pg.npwp || "";
+        document.getElementById('fKwtBank').value = pg.bank || "Sumsel Babel Cabang Lahat";
+        document.getElementById('fKwtNorek').value = pg.norek || "";
+      } else {
+        document.getElementById('fKwtNpwp').value = "";
+        document.getElementById('fKwtBank').value = "Sumsel Babel Cabang Lahat";
+        document.getElementById('fKwtNorek').value = "";
+      }
+    }
+
+    function openNewSTForm() {
+      document.getElementById('editStId').value = "";
+      document.getElementById('formTitle').textContent = "Buat Surat Tugas (ST) & SPD Baru";
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById('fKategori').value = "Dalam Daerah";
+      document.getElementById('fNoST').value = "";
+      document.getElementById('fNoSPDBase').value = "";
+      document.getElementById('fJenisPerjadin').value = "Perjalanan Dinas Biasa";
+      document.getElementById('fTglST').value = today;
+      document.getElementById('fTglBerangkat').value = today;
+      document.getElementById('fTglKembali').value = today;
+      document.getElementById('fLamaHari').value = 1;
+      document.getElementById('fAsal').value = "Lahat";
+      document.getElementById('fTujuanInstansi').value = "";
+      document.getElementById('fTujuanKota').value = "Lahat";
+      document.getElementById('fTujuanProv').value = "Sumatera Selatan";
+      refreshPilihanTujuan("Lahat", "Sumatera Selatan", false);
+      document.getElementById('fMataAnggaran').value = "5.1.02.01.001.0003";
+      document.getElementById('fDasar').value = "Peraturan Daerah Kabupaten Lahat Nomor 01 Tahun 2024 tentang Pajak Daerah dan Retribusi Daerah";
+      document.getElementById('fAlatAngkut').value = "Angkutan Darat";
+      document.getElementById('fMaksud').value = "";
+
+      document.getElementById('fSubKegiatan').value = "5.02.04.2.01.0009 Pelayanan dan Konsultasi Pajak Daerah";
+      updateNoBuktiKwtOtomatis();
+      document.getElementById('fRekGiroSKPD').value = "14231000472 / Bank Sumsel Cabang Lahat";
+      document.getElementById('fKwtNpwp').value = "";
+      document.getElementById('fKwtBank').value = "Sumsel Babel Cabang Lahat";
+      document.getElementById('fKwtNorek').value = "";
+      document.getElementById('fUmPersen').value = "0";
+
+      document.getElementById('personelContainer').innerHTML = "";
+      addPersonelRow(null, false);
+      refreshPenerimaKwitansiOptions(0);
+      handleTujuanChange();
+      updateFormGrandTotal();
+      switchTab('form');
+    }
+
+    function editST(id) {
+      const st = stList.find(x => x.id === id);
+      if (!st) return;
+
+      document.getElementById('editStId').value = st.id;
+      document.getElementById('formTitle').textContent = "Edit Surat Tugas: " + st.noST;
+      document.getElementById('fKategori').value = st.kategori;
+      document.getElementById('fNoST').value = extractDocumentSerial(st.noST);
+      document.getElementById('fNoSPDBase').value = extractDocumentSerial(st.noSPDBase);
+      document.getElementById('fJenisPerjadin').value = st.jenisPerjadin || "Perjalanan Dinas Biasa";
+      document.getElementById('fTglST').value = st.tglST;
+      document.getElementById('fTglBerangkat').value = st.tglBerangkat;
+      document.getElementById('fTglKembali').value = st.tglKembali;
+      document.getElementById('fLamaHari').value = st.lamaHari;
+      document.getElementById('fAsal').value = st.asal || "Lahat";
+      document.getElementById('fTujuanInstansi').value = st.tujuanInstansi || "";
+      document.getElementById('fTujuanKota').value = st.tujuanKota || "";
+      document.getElementById('fTujuanProv').value = st.tujuanProv || "Sumatera Selatan";
+      refreshPilihanTujuan(st.tujuanKota || "", st.tujuanProv || "Sumatera Selatan", false);
+      const validReks = ["5.1.02.04.001.0001", "5.1.02.01.001.0003"];
+      const defaultRek = st.kategori === "Dalam Daerah" ? "5.1.02.01.001.0003" : "5.1.02.04.001.0001";
+      document.getElementById('fMataAnggaran').value = validReks.includes(st.mataAnggaran) ? st.mataAnggaran : defaultRek;
+      document.getElementById('fDasar').value = st.dasar || "";
+      document.getElementById('fAlatAngkut').value = st.alatAngkut || "Angkutan Darat";
+      document.getElementById('fMaksud').value = st.maksud || "";
+      document.getElementById('fTtdST').value = st.ttdST || "pj-4";
+      document.getElementById('fTtdSPD').value = st.ttdSPD || "pj-2";
+      document.getElementById('fTtdPPTK').value = st.ttdPPTK || "pj-4";
+      document.getElementById('fTtdBendahara').value = st.ttdBendahara || "pj-6";
+      const subSel = document.getElementById('fSubKegiatan');
+      const hasSubOption = Array.from(subSel.options).some(o => o.value === st.subKegiatan);
+      subSel.value = hasSubOption ? st.subKegiatan : "5.02.04.2.01.0009 Pelayanan dan Konsultasi Pajak Daerah";
+      document.getElementById('fNoBuktiKwt').value = st.noBuktiKwt || generateNoBuktiKwitansi(subSel.value, document.getElementById('fMataAnggaran').value);
+      document.getElementById('fRekGiroSKPD').value = st.rekGiroSKPD || "14231000472 / Bank Sumsel Cabang Lahat";
+      document.getElementById('fKwtNpwp').value = st.kwtNpwp || "";
+      document.getElementById('fKwtBank').value = st.kwtBank || "Sumsel Babel Cabang Lahat";
+      document.getElementById('fKwtNorek').value = st.kwtNorek || "";
+      document.getElementById('fUmPersen').value = st.umPersen || "0";
+
+      const container = document.getElementById('personelContainer');
+      container.innerHTML = "";
+      (st.personel || []).forEach(p => addPersonelRow(p, false));
+      refreshPenerimaKwitansiOptions(st.penerimaKwitansiIdx || 0);
+      handleTujuanChange(false, false);
+      updateFormGrandTotal();
+      switchTab('form');
+    }
+
+    function deleteST(id) {
+      if (!confirm("Hapus data Surat Tugas & SPJ ini?")) return;
+      stList = stList.filter(x => x.id !== id);
+      saveLocalState(true);
+      renderDashboard();
+      showToast("Data Surat Tugas berhasil dihapus", "🗑️");
+    }
+
+    // =========================================================
+    // FORMAT NOMOR SURAT OTOMATIS (ST / SPD)
+    // =========================================================
+    // Kode bulan pada nomor ST/SPD Bapenda bersifat tetap, bukan mengikuti bulan tanggal ST.
+    function getRomanMonth(dateValue) {
+      return 'III';
+    }
+
+    function getDocumentYear(dateValue) {
+      const year = Number((dateValue || '').split('-')[0]);
+      return year >= 1900 ? year : new Date().getFullYear();
+    }
+
+    function extractDocumentSerial(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return '';
+      if (raw.includes('/')) return (raw.split('/')[1] || '').trim();
+      return raw;
+    }
+
+    function buildSTNumber(serial, dateValue) {
+      const number = extractDocumentSerial(serial);
+      return number ? `900/${number}/Bapenda/${getRomanMonth(dateValue)}/${getDocumentYear(dateValue)}` : '';
+    }
+
+    function buildSPDNumber(serial, dateValue) {
+      const number = extractDocumentSerial(serial);
+      return number ? `090/${number}/SPD/Bapenda/${getRomanMonth(dateValue)}/${getDocumentYear(dateValue)}` : '';
+    }
+
+    function formatSTNumberHTML(st) {
+      const dateValue = st.tglST || '';
+      const number = String(st.noST || '').trim();
+      if (number) {
+        return escapePrintText(number.includes('/') ? number : buildSTNumber(number, dateValue));
+      }
+      return `900/<span style="display:inline-block; width:12mm; text-align:center;">&nbsp;&nbsp;&nbsp;&nbsp;</span>/Bapenda/${getRomanMonth(dateValue)}/${getDocumentYear(dateValue)}`;
+    }
+
+    function formatSPDNumberHTML(personel, st) {
+      const dateValue = st.tglST || '';
+      const number = String((personel && personel.noSPD) || '').trim();
+      if (number) {
+        return escapePrintText(number.includes('/') ? number : buildSPDNumber(number, dateValue));
+      }
+      return `090/<span style="display:inline-block; width:12mm; text-align:center;">&nbsp;&nbsp;&nbsp;&nbsp;</span>/SPD/Bapenda/${getRomanMonth(dateValue)}/${getDocumentYear(dateValue)}`;
+    }
+
+    function escapePrintText(value) {
+      return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function formatKwitansiNumberHTML(value) {
+      const parts = String(value || '').split('/');
+      if (parts.length >= 4 && parts[0].trim() === '900') {
+        const blank = '<span style="display:inline-block; width:12mm; text-align:center;">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+        const firstSerial = parts[1].trim() ? escapePrintText(parts[1].trim()) : blank;
+        const secondSerial = parts[2].trim() ? escapePrintText(parts[2].trim()) : blank;
+        return escapePrintText(parts[0]) + '/' + firstSerial + '/' + secondSerial + '/' + parts.slice(3).map(escapePrintText).join('/');
+      }
+      return escapePrintText(value || '');
+    }
+
+    // =========================================================
+    // PENGATURAN KERTAS DAN MARGIN CETAK
+    // =========================================================
+    const PRINT_PAPER_PRESETS = {
+      F4: { width: 215, height: 330 },
+      A4: { width: 210, height: 297 },
+      Letter: { width: 216, height: 279 },
+      Legal: { width: 216, height: 356 }
+    };
+
+    function getPrintSettingsFromForm() {
+      const paper = document.getElementById('printPaperSize')?.value || 'F4';
+      const preset = PRINT_PAPER_PRESETS[paper] || PRINT_PAPER_PRESETS.F4;
+      const width = paper === 'Custom' ? Number(document.getElementById('printPaperWidth').value) : preset.width;
+      const height = paper === 'Custom' ? Number(document.getElementById('printPaperHeight').value) : preset.height;
+      return {
+        paper, width: Math.max(50, Math.min(500, width || 215)), height: Math.max(50, Math.min(600, height || 330)),
+        top: Math.max(0, Math.min(50, Number(document.getElementById('printMarginTop').value) || 0)),
+        bottom: Math.max(0, Math.min(50, Number(document.getElementById('printMarginBottom').value) || 0)),
+        left: Math.max(0, Math.min(50, Number(document.getElementById('printMarginLeft').value) || 0)),
+        right: Math.max(0, Math.min(50, Number(document.getElementById('printMarginRight').value) || 0))
+      };
+    }
+
+    function applyPrintSettings(settings) {
+      const s = settings || getPrintSettingsFromForm();
+      let style = document.getElementById('dynamicPrintPageStyle');
+      if (!style) {
+        style = document.createElement('style');
+        style.id = 'dynamicPrintPageStyle';
+        document.head.appendChild(style);
+      }
+      style.textContent = `@media print { @page { size: ${s.width}mm ${s.height}mm; margin: ${s.top}mm ${s.right}mm ${s.bottom}mm ${s.left}mm; } }`;
+    }
+
+    function handlePrintPaperChange() {
+      const paper = document.getElementById('printPaperSize').value;
+      const customWrap = document.getElementById('customPaperWrap');
+      customWrap.classList.toggle('hidden', paper !== 'Custom');
+      if (paper !== 'Custom' && PRINT_PAPER_PRESETS[paper]) {
+        document.getElementById('printPaperWidth').value = PRINT_PAPER_PRESETS[paper].width;
+        document.getElementById('printPaperHeight').value = PRINT_PAPER_PRESETS[paper].height;
+      }
+      applyPrintSettings();
+    }
+
+    function savePrintSettings() {
+      const settings = getPrintSettingsFromForm();
+      localStorage.setItem('esppd_print_settings_v1', JSON.stringify(settings));
+      applyPrintSettings(settings);
+      showToast('Pengaturan kertas dan margin berhasil disimpan', '✅');
+    }
+
+    function loadPrintSettings() {
+      let settings = null;
+      try { settings = JSON.parse(localStorage.getItem('esppd_print_settings_v1') || 'null'); } catch (e) {}
+      if (settings) {
+        document.getElementById('printPaperSize').value = settings.paper || 'F4';
+        document.getElementById('printPaperWidth').value = settings.width || 215;
+        document.getElementById('printPaperHeight').value = settings.height || 330;
+        document.getElementById('printMarginTop').value = settings.top ?? 8;
+        document.getElementById('printMarginBottom').value = settings.bottom ?? 8;
+        document.getElementById('printMarginLeft').value = settings.left ?? 8;
+        document.getElementById('printMarginRight').value = settings.right ?? 8;
+      }
+      handlePrintPaperChange();
+    }
+
+    function printWithSettings() {
+      applyPrintSettings(getPrintSettingsFromForm());
+      window.print();
+    }
+
+    function generateNoBuktiKwitansi(subKegiatanStr, mataAnggaranStr) {
+      const kodeSubFull = (subKegiatanStr || "").split(" ")[0] || "5.02.04.2.01.0009";
+      const segmenSub = kodeSubFull.split(".");
+      const duaDigitSub = segmenSub.length > 0 ? segmenSub[segmenSub.length - 1].slice(-2).padStart(2, "0") : "09";
+      const kegiatanSubKode = "01." + duaDigitSub;
+      const rek = (mataAnggaranStr || "5.1.02.04.001.0001").trim();
+      return "900/    /    /" + kegiatanSubKode + "/" + rek + "/Bapenda/III/2026";
+    }
+
+    function updateNoBuktiKwtOtomatis() {
+      const subKeg = document.getElementById('fSubKegiatan').value;
+      const mataAngg = document.getElementById('fMataAnggaran').value;
+      document.getElementById('fNoBuktiKwt').value = generateNoBuktiKwitansi(subKeg, mataAngg);
+    }
+
+    function getDaftarTujuanByKategori(kategori) {
+      const daftar = [];
+      const seen = new Set();
+
+      const tambah = (kota, provinsi) => {
+        kota = String(kota || "").trim();
+        provinsi = String(provinsi || "").trim();
+        if (!kota) return;
+        const key = normText(kota) + "|" + normText(provinsi);
+        if (seen.has(key)) return;
+        seen.add(key);
+        daftar.push({ kota, provinsi });
+      };
+
+      // Lokasi dari Master Tarif untuk kategori perjalanan yang dipilih.
+      (tarifList || []).forEach(t => {
+        if (t && t.kategori === kategori) tambah(t.kota, t.provinsi);
+      });
+
+      // Lokasi dari ST yang pernah disimpan dengan kategori yang sama.
+      (stList || []).forEach(st => {
+        if (st && st.kategori === kategori) tambah(st.tujuanKota, st.tujuanProv);
+      });
+
+      // Dalam daerah selalu tersedia Kabupaten Lahat.
+      if (kategori === "Dalam Daerah") tambah("Lahat", "Sumatera Selatan");
+
+      return daftar.sort((a, b) => a.kota.localeCompare(b.kota, 'id'));
+    }
+
+    function refreshPilihanTujuan(preferredKota = "", preferredProv = "", clearIfMultiple = false) {
+      const wrap = document.getElementById('tujuanPilihanWrap');
+      const select = document.getElementById('fTujuanKotaPilihan');
+      if (!wrap || !select) return;
+
+      const kategori = document.getElementById('fKategori').value;
+      const daftar = getDaftarTujuanByKategori(kategori);
+      const kotaEl = document.getElementById('fTujuanKota');
+      const provEl = document.getElementById('fTujuanProv');
+
+      // Pertahankan tujuan ST yang sedang diedit meskipun belum ada di daftar.
+      if (preferredKota) {
+        const exists = daftar.some(x =>
+          normText(x.kota) === normText(preferredKota) &&
+          (!preferredProv || normText(x.provinsi) === normText(preferredProv))
+        );
+        if (!exists) daftar.push({ kota: preferredKota, provinsi: preferredProv || "" });
+      }
+
+      select.innerHTML = '<option value="">-- Pilih Kabupaten/Kota Tujuan --</option>';
+      daftar.forEach((item, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = item.kota + (item.provinsi ? ' — ' + item.provinsi : '');
+        opt.dataset.kota = item.kota;
+        opt.dataset.provinsi = item.provinsi;
+        select.appendChild(opt);
+      });
+
+      // Tampilkan dropdown jika ada lebih dari satu tujuan terdaftar.
+      wrap.classList.toggle('hidden', daftar.length < 2);
+
+      const currentKota = preferredKota || kotaEl.value;
+      const currentProv = preferredProv || provEl.value;
+      const matchIndex = daftar.findIndex(x =>
+        normText(x.kota) === normText(currentKota) &&
+        (!currentProv || !x.provinsi || normText(x.provinsi) === normText(currentProv))
+      );
+
+      if (matchIndex >= 0 && !clearIfMultiple) {
+        select.value = String(matchIndex);
+        kotaEl.value = daftar[matchIndex].kota;
+        if (daftar[matchIndex].provinsi) provEl.value = daftar[matchIndex].provinsi;
+      } else if (daftar.length === 1) {
+        select.value = "0";
+        kotaEl.value = daftar[0].kota;
+        provEl.value = daftar[0].provinsi || "";
+      } else if (clearIfMultiple) {
+        select.value = "";
+        kotaEl.value = "";
+        provEl.value = "";
+      } else {
+        select.value = "";
+      }
+    }
+
+    function pilihTujuanTerdaftar() {
+      const select = document.getElementById('fTujuanKotaPilihan');
+      const option = select.options[select.selectedIndex];
+      if (!option || !option.dataset.kota) return;
+
+      document.getElementById('fTujuanKota').value = option.dataset.kota;
+      document.getElementById('fTujuanProv').value = option.dataset.provinsi || "";
+      handleTujuanChange();
+    }
+
+    function handleTujuanManualChange(field) {
+      const kota = document.getElementById('fTujuanKota').value.trim();
+      const prov = document.getElementById('fTujuanProv').value.trim();
+      const select = document.getElementById('fTujuanKotaPilihan');
+
+      if (field === 'kota') {
+        const daftar = getDaftarTujuanByKategori(document.getElementById('fKategori').value);
+        const idx = daftar.findIndex(x => normText(x.kota) === normText(kota));
+        if (idx >= 0) {
+          document.getElementById('fTujuanProv').value = daftar[idx].provinsi || prov;
+          refreshPilihanTujuan(kota, document.getElementById('fTujuanProv').value, false);
+        } else if (select) {
+          select.value = "";
+        }
+      } else if (select) {
+        const daftar = getDaftarTujuanByKategori(document.getElementById('fKategori').value);
+        const idx = daftar.findIndex(x =>
+          normText(x.kota) === normText(kota) && normText(x.provinsi) === normText(prov)
+        );
+        select.value = idx >= 0 ? String(idx) : "";
+      }
+
+      handleTujuanChange();
+    }
+
+    function handleKategoriChange() {
+      const kat = document.getElementById('fKategori').value;
+
+      if (kat === "Dalam Daerah") {
+        document.getElementById('fMataAnggaran').value = "5.1.02.01.001.0003";
+        refreshPilihanTujuan("Lahat", "Sumatera Selatan", false);
+      } else {
+        document.getElementById('fMataAnggaran').value = "5.1.02.04.001.0001";
+        // Jika terdapat beberapa tujuan untuk kategori ini, minta petugas memilih.
+        // Tidak lagi mengunci tujuan luar provinsi ke Jakarta.
+        refreshPilihanTujuan("", "", true);
+      }
+
+      updateNoBuktiKwtOtomatis();
+      handleTujuanChange();
+    }
+
+    function updateHotelCalculationDisplay(card, recalculateAmount = true) {
+      const rate = Number(card.querySelector('.p-hotel-limit').value) || 0;
+      const totalNights = getJumlahMalamPenginapan();
+      const mode = card.querySelector('.p-ambil30').value;
+      const info = card.querySelector('.p-hotel-info');
+      const input = card.querySelector('.p-hotel-total');
+      const campBox = card.querySelector('.p-hotel-campuran-box');
+
+      if (campBox) {
+        campBox.classList.toggle('hidden', mode !== 'Campuran');
+      }
+
+      if (mode === 'Ya') {
+        const total = Math.round(rate * totalNights * 0.30);
+        if (recalculateAmount) input.value = total;
+        input.readOnly = true;
+        if (info) info.textContent = 'Tanpa Bill (30%): ' + formatRupiah(rate) + ' × ' + totalNights + ' mlm × 30% = ' + formatRupiah(Number(input.value) || 0);
+      } else if (mode === 'Campuran') {
+        const billMalamInput = card.querySelector('.p-hotel-bill-malam');
+        const billNomInput = card.querySelector('.p-hotel-bill-nominal');
+        let malamBill = Math.min(totalNights, Math.max(0, Number(billMalamInput.value) || 0));
+        billMalamInput.value = malamBill;
+        const malam30 = Math.max(0, totalNights - malamBill);
+        const nomBill = Number(billNomInput.value) || 0;
+        const nom30 = Math.round(rate * malam30 * 0.30);
+        const total = nomBill + nom30;
+
+        if (recalculateAmount) input.value = total;
+        input.readOnly = true;
+        if (info) info.textContent = 'Bill (' + malamBill + ' mlm: ' + formatRupiah(nomBill) + ') + 30% (' + malam30 + ' mlm: ' + formatRupiah(nom30) + ')';
+      } else {
+        input.readOnly = false;
+        if (info) info.textContent = 'Dengan Bill: isi manual sesuai tagihan. Batas tarif: ' + formatRupiah(rate) + '/mlm.';
+      }
+    }
+
+    function handleHotelCampuranInput(el) {
+      const card = el.closest('.personel-card');
+      updateHotelCalculationDisplay(card, true);
+      updateFormGrandTotal();
+    }
+
+    function handleTujuanChange(recalculateHotel = true, refreshUangHarian = true) {
+      const uangHarian = getTarifUangHarian();
+      document.querySelectorAll('.personel-card').forEach(card => {
+        if (refreshUangHarian) card.querySelector('.p-uh-rate').value = uangHarian;
+        const limit = getTarifHotelBySBU(findTarifHotelTujuan(), card.querySelector('.p-sbu').value);
+        card.querySelector('.p-hotel-limit').value = limit;
+        const mode = card.querySelector('.p-ambil30').value;
+        if (recalculateHotel && (mode === 'Ya' || mode === 'Campuran')) {
+          updateHotelCalculationDisplay(card, true);
+        } else {
+          updateHotelCalculationDisplay(card, recalculateHotel);
+        }
+      });
+      updateFormGrandTotal();
+    }
+
+    function handleHotelModeChange(selectEl) {
+      const card = selectEl.closest('.personel-card');
+      if (selectEl.value === 'Campuran') {
+        const nights = getJumlahMalamPenginapan();
+        const billMalamEl = card.querySelector('.p-hotel-bill-malam');
+        if (Number(billMalamEl.value) === 0 && nights > 1) {
+          billMalamEl.value = 1;
+        }
+      }
+      updateHotelCalculationDisplay(card, true);
+      updateFormGrandTotal();
+      if (selectEl.value === 'Tidak') card.querySelector('.p-hotel-total').focus();
+    }
+
+    function hitungLamaHari() {
+      const b = document.getElementById('fTglBerangkat').value;
+      const k = document.getElementById('fTglKembali').value;
+      if (b && k) {
+        const d1 = new Date(b);
+        const d2 = new Date(k);
+        const diff = Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+        if (diff >= 1) {
+          document.getElementById('fLamaHari').value = diff;
+          if (typeof handleTujuanChange === 'function') handleTujuanChange();
+        }
+      }
+    }
+
+    function getDefaultUangHarian(kategori) {
+      if (kategori === "Dalam Daerah") return 150000;
+      if (kategori === "Luar Daerah (Dalam Provinsi)") return 380000;
+      return 530000;
+    }
+
+    function normText(v) { return String(v || "").trim().toLocaleLowerCase('id-ID'); }
+
+    function findTarifTujuan() {
+      // Tarif uang harian mengikuti tujuan dan kategori perjalanan.
+      const kota = normText(document.getElementById('fTujuanKota').value);
+      const prov = normText(document.getElementById('fTujuanProv').value);
+      const kategori = document.getElementById('fKategori').value;
+      return tarifList.find(t => normText(t.kota) === kota && normText(t.provinsi) === prov && t.kategori === kategori)
+        || tarifList.find(t => normText(t.kota) === kota && t.kategori === kategori)
+        || null;
+    }
+
+    function findTarifHotelTujuan() {
+      // Batas penginapan mengikuti kota/provinsi tujuan dan SBU,
+      // sehingga tidak gagal hanya karena kategori perjalanan berbeda.
+      const kota = normText(document.getElementById('fTujuanKota').value);
+      const prov = normText(document.getElementById('fTujuanProv').value);
+      const kategori = document.getElementById('fKategori').value;
+      return tarifList.find(t => normText(t.kota) === kota && normText(t.provinsi) === prov && t.kategori === kategori)
+        || tarifList.find(t => normText(t.kota) === kota && normText(t.provinsi) === prov)
+        || tarifList.find(t => normText(t.kota) === kota && t.kategori === kategori)
+        || tarifList.find(t => normText(t.kota) === kota)
+        || null;
+    }
+
+    function getTarifHotelBySBU(tarif, sbu) {
+      if (!tarif) return 0;
+      if (sbu === "Eselon II") return Number(tarif.hotelEselonII) || 0;
+      if (sbu === "Eselon III" || sbu === "Gol IV") return Number(tarif.hotelEselonIII) || 0;
+      if (sbu === "Eselon IV" || sbu === "Gol III") return Number(tarif.hotelEselonIV) || 0;
+      if (sbu === "Gol II") return Number(tarif.hotelGolII) || 0;
+      if (sbu === "Non-ASN") return Number(tarif.hotelNonASN) || 0;
+      return 0;
+    }
+
+    function getTarifUangHarian() {
+      const tarif = findTarifTujuan();
+      return tarif && Number(tarif.uangHarian) > 0 ? Number(tarif.uangHarian) : getDefaultUangHarian(document.getElementById('fKategori').value);
+    }
+
+    function getJumlahMalamPenginapan() {
+      const berangkat = document.getElementById('fTglBerangkat').value;
+      const kembali = document.getElementById('fTglKembali').value;
+      if (!berangkat || !kembali) return 0;
+      const diff = Math.round((new Date(kembali) - new Date(berangkat)) / 86400000);
+      return Math.max(0, diff);
+    }
+
+    function addPersonelRow(existingData = null, isManualNew = false) {
+      const container = document.getElementById('personelContainer');
+      const lama = Number(document.getElementById('fLamaHari').value) || 1;
+      const kat = document.getElementById('fKategori').value;
+      const defaultUH = getTarifUangHarian();
+      const defaultPegawai = !isManualNew && pegawaiList[0] ? pegawaiList[0] : null;
+
+      const p = existingData || {
+        noSPD: "",
+        nama: isManualNew ? "" : (pegawaiList[0] ? pegawaiList[0].nama : ""),
+        nip: isManualNew ? "" : (pegawaiList[0] ? pegawaiList[0].nip : ""),
+        pangkat: isManualNew ? "" : (pegawaiList[0] ? pegawaiList[0].pangkat : ""),
+        jabatan: isManualNew ? "" : (pegawaiList[0] ? pegawaiList[0].jabatan : ""),
+        sbu: isManualNew ? "Gol III" : (pegawaiList[0] ? pegawaiList[0].sbu : "Gol III"),
+        uhPerHari: defaultUH,
+        uhHari: lama,
+        bimtekPerHari: 0,
+        bimtekHari: 0,
+        repPerHari: 0,
+        repHari: 0,
+        hotelNama: "",
+        hotelKamar: "",
+        hotelFolio: "",
+        ambil30Persen: "Ya",
+        hotelLimitPerMalam: getTarifHotelBySBU(findTarifHotelTujuan(), defaultPegawai ? defaultPegawai.sbu : "Gol III"),
+        hotelMalam: getJumlahMalamPenginapan(),
+        hotelTotal: Math.round(getTarifHotelBySBU(findTarifHotelTujuan(), defaultPegawai ? defaultPegawai.sbu : "Gol III") * getJumlahMalamPenginapan() * 0.30),
+        taksiTotal: 0,
+        daratJenis: "Pribadi",
+        daratPlat: "",
+        daratTotal: 0,
+        udaraMaskapai: "",
+        udaraBooking: "",
+        udaraTotal: 0,
+        airTotal: 0,
+        kapalTiket: "",
+        kapalTotal: 0,
+        tollKeterangan: "",
+        tollTotal: 0,
+        biayaLainKeterangan: "",
+        biayaLainTotal: 0
+      };
+
+      const masterOptions = '<option value="">-- Ketik Manual / Personel Baru --</option>' +
+        pegawaiList.map(pg =>
+          '<option value="' + pg.nip + '"' + (pg.nip === p.nip ? ' selected' : '') + '>' + pg.nama + ' (' + pg.nip + ')</option>'
+        ).join("");
+
+      const card = document.createElement('div');
+      card.className = "personel-card bg-slate-50 border border-slate-300 rounded-xl p-4 space-y-4";
+      card.innerHTML =
+        '<div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2.5">' +
+          '<div class="flex items-center gap-2">' +
+            '<span class="personel-badge bg-slate-800 text-white text-xs font-bold px-2.5 py-1 rounded">Personel</span>' +
+            '<select onchange="onSelectMasterPegawai(this)" class="text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg bg-white max-w-xs">' +
+              masterOptions +
+            '</select>' +
+          '</div>' +
+          '<div class="flex items-center gap-3">' +
+            '<label class="flex items-center gap-1.5 text-xs text-sky-800 font-medium cursor-pointer">' +
+              '<input type="checkbox" class="p-save-master rounded text-sky-600" ' + (isManualNew ? 'checked' : '') + ' />' +
+              '<span>Simpan ke Master Pegawai</span>' +
+            '</label>' +
+            '<button type="button" onclick="removePersonelRow(this)" class="text-xs text-rose-600 hover:bg-rose-50 px-2 py-1 rounded font-semibold">✕ Hapus</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- IDENTITAS PEGAWAI & NOMOR SPD -->' +
+        '<div class="grid grid-cols-1 md:grid-cols-6 gap-3">' +
+          '<div class="md:col-span-2">' +
+            '<label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Lengkap & Gelar *</label>' +
+            '<input type="text" oninput="refreshPenerimaKwitansiOptions()" class="p-nama w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded bg-white" value="' + (p.nama || '') + '" />' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-semibold text-slate-600 mb-1">NIP / NRP / NIPPPK</label>' +
+            '<input type="text" class="p-nip w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded bg-white" value="' + (p.nip || '') + '" />' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-semibold text-slate-600 mb-1">Pangkat / Golongan</label>' +
+            '<input type="text" class="p-pangkat w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded bg-white" value="' + (p.pangkat || '') + '" />' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-semibold text-slate-600 mb-1">Jabatan</label>' +
+            '<input type="text" class="p-jabatan w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded bg-white" value="' + (p.jabatan || '') + '" />' +
+          '</div>' +
+          '<div>' +
+            '<label class="block text-[11px] font-semibold text-slate-600 mb-1">Kategori SBU</label>' +
+            '<select onchange="handlePersonelSBUChange(this)" class="p-sbu w-full text-xs px-2 py-1.5 border border-slate-300 rounded bg-white">' +
+              '<option value="Eselon II"' + (p.sbu === 'Eselon II' ? ' selected' : '') + '>Eselon II</option>' +
+              '<option value="Eselon III"' + (p.sbu === 'Eselon III' ? ' selected' : '') + '>Eselon III</option>' +
+              '<option value="Gol IV"' + (p.sbu === 'Gol IV' ? ' selected' : '') + '>Gol IV</option>' +
+              '<option value="Eselon IV"' + (p.sbu === 'Eselon IV' ? ' selected' : '') + '>Eselon IV</option>' +
+              '<option value="Gol III"' + (p.sbu === 'Gol III' ? ' selected' : '') + '>Gol III / ASN</option>' +
+              '<option value="Gol II"' + (p.sbu === 'Gol II' ? ' selected' : '') + '>Gol II / PPPK</option>' +
+              '<option value="Non-ASN"' + (p.sbu === 'Non-ASN' ? ' selected' : '') + '>Non-ASN</option>' +
+            '</select>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- RINCIAN KOMPONEN BIAYA SPJ -->' +
+        '<div class="bg-white p-3 rounded-lg border border-slate-200 space-y-3">' +
+          '<div class="flex flex-wrap items-center justify-between gap-2">' +
+            '<div class="text-xs font-bold text-slate-700">Rincian Biaya Perjalanan Dinas (SPJ)</div>' +
+            '<div class="flex items-center gap-2">' +
+              '<label class="text-[11px] text-slate-500">Nomor SPD Individu:</label>' +
+              '<input type="text" class="p-nospd text-xs px-2 py-1 border border-slate-300 rounded w-56 font-mono" placeholder="Otomatis dari Prefix" value="' + (p.noSPD || '') + '" />' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">' +
+            '<!-- Uang Harian -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Uang Harian Biasa</div>' +
+              '<div class="grid grid-cols-2 gap-1">' +
+                '<input type="number" oninput="updateFormGrandTotal()" class="p-uh-rate px-2 py-1 border rounded bg-white" placeholder="Tarif/hr" value="' + (p.uhPerHari || 0) + '" />' +
+                '<input type="number" oninput="updateFormGrandTotal()" class="p-uh-days px-2 py-1 border rounded bg-white" placeholder="Hari" value="' + (p.uhHari || 0) + '" />' +
+              '</div>' +
+            '</div>' +
+
+            '<!-- Uang Harian Diklat -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Uang Harian Diklat/Bimtek</div>' +
+              '<div class="grid grid-cols-2 gap-1">' +
+                '<input type="number" oninput="updateFormGrandTotal()" class="p-bimtek-rate px-2 py-1 border rounded bg-white" placeholder="Tarif/hr" value="' + (p.bimtekPerHari || 0) + '" />' +
+                '<input type="number" oninput="updateFormGrandTotal()" class="p-bimtek-days px-2 py-1 border rounded bg-white" placeholder="Hari" value="' + (p.bimtekHari || 0) + '" />' +
+              '</div>' +
+            '</div>' +
+
+            '<!-- Representasi -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Biaya Representasi</div>' +
+              '<div class="grid grid-cols-2 gap-1">' +
+                '<input type="number" oninput="updateFormGrandTotal()" class="p-rep-rate px-2 py-1 border rounded bg-white" placeholder="Tarif/hr" value="' + (p.repPerHari || 0) + '" />' +
+                '<input type="number" oninput="updateFormGrandTotal()" class="p-rep-days px-2 py-1 border rounded bg-white" placeholder="Hari" value="' + (p.repHari || 0) + '" />' +
+              '</div>' +
+            '</div>' +
+
+            '<!-- Penginapan / Hotel -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="flex justify-between items-center gap-1 mb-1">' +
+                '<span class="font-semibold text-slate-700">Biaya Penginapan</span>' +
+                '<select onchange="handleHotelModeChange(this)" class="p-ambil30 text-[10px] border rounded px-1 py-0.5 bg-white max-w-[130px]">' +
+                  '<option value="Tidak"' + (p.ambil30Persen === 'Tidak' ? ' selected' : '') + '>Dengan Bill</option>' +
+                  '<option value="Ya"' + (p.ambil30Persen === 'Ya' ? ' selected' : '') + '>Tanpa Bill (30%)</option>' +
+                  '<option value="Campuran"' + (p.ambil30Persen === 'Campuran' ? ' selected' : '') + '>Tanpa Bill (30%) + Dengan Bill</option>' +
+                '</select>' +
+              '</div>' +
+              '<div class="p-hotel-campuran-box ' + (p.ambil30Persen === 'Campuran' ? '' : 'hidden') + ' grid grid-cols-2 gap-1 mb-1">' +
+                '<input type="number" min="0" oninput="handleHotelCampuranInput(this)" class="p-hotel-bill-malam px-1.5 py-0.5 border rounded bg-white text-[11px]" placeholder="Malam Bill" title="Jumlah malam pakai bill" value="' + (p.hotelBillMalam || 0) + '" />' +
+                '<input type="number" min="0" oninput="handleHotelCampuranInput(this)" class="p-hotel-bill-nominal px-1.5 py-0.5 border rounded bg-white text-[11px]" placeholder="Nominal Bill" title="Total rupiah sesuai bill" value="' + (p.hotelBillNominal || 0) + '" />' +
+              '</div>' +
+              '<input type="number" oninput="updateFormGrandTotal()" class="p-hotel-total w-full px-2 py-1 border rounded bg-white font-semibold" placeholder="Total Penginapan" value="' + (p.hotelTotal || 0) + '" ' + (p.ambil30Persen === 'Ya' || p.ambil30Persen === 'Campuran' ? 'readonly' : '') + ' />' +
+              '<div class="p-hotel-info text-[10px] text-slate-500 mt-1 leading-relaxed"></div>' +
+              '<input type="hidden" class="p-hotel-limit" value="' + (p.hotelLimitPerMalam || 0) + '" />' +
+            '</div>' +
+
+            '<!-- Transport Darat -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Transport Darat / BBM (Rp)</div>' +
+              '<input type="number" oninput="updateFormGrandTotal()" class="p-darat-total w-full px-2 py-1 border rounded bg-white" value="' + (p.daratTotal || 0) + '" />' +
+            '</div>' +
+
+            '<!-- Biaya Taksi -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Biaya Taksi (Rp)</div>' +
+              '<input type="number" oninput="updateFormGrandTotal()" class="p-taksi-total w-full px-2 py-1 border rounded bg-white" value="' + (p.taksiTotal || 0) + '" />' +
+            '</div>' +
+
+            '<!-- Transport Udara -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Transport Pesawat / Tiket (Rp)</div>' +
+              '<input type="number" min="0" oninput="updateFormGrandTotal()" class="p-udara-total w-full px-2 py-1 border rounded bg-white" value="' + (p.udaraTotal || 0) + '" />' +
+              '<input type="text" class="p-udara-maskapai w-full mt-1 px-2 py-1 border rounded bg-white" placeholder="Maskapai / nomor tiket" value="' + (p.udaraMaskapai || '') + '" />' +
+              '<input type="text" class="p-udara-booking w-full mt-1 px-2 py-1 border rounded bg-white" placeholder="Kode booking" value="' + (p.udaraBooking || '') + '" />' +
+            '</div>' +
+
+            '<!-- Transport Kapal -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Transport Kapal / Tiket (Rp)</div>' +
+              '<input type="number" min="0" oninput="updateFormGrandTotal()" class="p-kapal-total w-full px-2 py-1 border rounded bg-white" value="' + (p.kapalTotal || p.airTotal || 0) + '" />' +
+              '<input type="text" class="p-kapal-tiket w-full mt-1 px-2 py-1 border rounded bg-white" placeholder="Nomor / keterangan tiket kapal" value="' + (p.kapalTiket || '') + '" />' +
+            '</div>' +
+
+            '<!-- Biaya Tol -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Biaya Tol (sesuai struk) (Rp)</div>' +
+              '<input type="number" min="0" oninput="updateFormGrandTotal()" class="p-toll-total w-full px-2 py-1 border rounded bg-white" value="' + (p.tollTotal || 0) + '" />' +
+              '<input type="text" class="p-toll-keterangan w-full mt-1 px-2 py-1 border rounded bg-white" placeholder="Keterangan / ruas tol" value="' + (p.tollKeterangan || '') + '" />' +
+            '</div>' +
+
+            '<!-- Biaya Lain-lain non Diklat -->' +
+            '<div class="p-2 bg-slate-50 rounded border border-slate-200">' +
+              '<div class="font-semibold text-slate-700 mb-1">Biaya Lain-lain (di luar Diklat/Bimtek) (Rp)</div>' +
+              '<input type="number" min="0" oninput="updateFormGrandTotal()" class="p-biaya-lain-total w-full px-2 py-1 border rounded bg-white" value="' + (p.biayaLainTotal || 0) + '" />' +
+              '<input type="text" class="p-biaya-lain-keterangan w-full mt-1 px-2 py-1 border rounded bg-white" placeholder="Uraian biaya lain-lain" value="' + (p.biayaLainKeterangan || '') + '" />' +
+            '</div>' +
+
+            '<!-- Transport Air & Subtotal -->' +
+            '<div class="p-2 bg-emerald-50 rounded border border-emerald-200 flex flex-col justify-between">' +
+              '<div class="text-[11px] font-semibold text-emerald-800">Total SPJ Personel Ini:</div>' +
+              '<div class="p-subtotal text-sm font-bold text-emerald-700">Rp 0</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- DETAIL HOTEL & TIKET OPSIONAL -->' +
+          '<details class="text-xs text-slate-600">' +
+            '<summary class="cursor-pointer font-semibold text-sky-700 hover:underline">Detail Tambahan (Nama Hotel, No. Kamar, Plat Kendaraan, Bukti Transportasi)</summary>' +
+            '<div class="grid grid-cols-2 md:grid-cols-5 gap-2 mt-2 pt-2 border-t border-slate-100">' +
+              '<input type="text" class="p-hotel-nama px-2 py-1 border rounded" placeholder="Nama Hotel" value="' + (p.hotelNama || '') + '" />' +
+              '<input type="text" class="p-hotel-kamar px-2 py-1 border rounded" placeholder="No. Kamar / Folio" value="' + (p.hotelKamar || '') + '" />' +
+              '<input type="text" class="p-darat-plat px-2 py-1 border rounded" placeholder="Plat Kendaraan (BG...)" value="' + (p.daratPlat || '') + '" />' +
+              '<input type="text" class="p-hotel-folio px-2 py-1 border rounded" placeholder="Nomor Folio / Bukti Hotel" value="' + (p.hotelFolio || '') + '" />' +
+            '</div>' +
+          '</details>' +
+        '</div>';
+
+      container.appendChild(card);
+      renumberPersonelCards();
+      updateHotelCalculationDisplay(card, !existingData);
+      refreshPenerimaKwitansiOptions();
+      updateFormGrandTotal();
+    }
+
+    function onSelectMasterPegawai(selectEl) {
+      const nip = selectEl.value;
+      const card = selectEl.closest('.personel-card');
+      if (!nip) {
+        card.querySelector('.p-nama').value = "";
+        card.querySelector('.p-nip').value = "";
+        card.querySelector('.p-pangkat').value = "";
+        card.querySelector('.p-jabatan').value = "";
+        card.querySelector('.p-save-master').checked = true;
+        return;
+      }
+      const pg = pegawaiList.find(x => x.nip === nip);
+      if (pg) {
+        card.querySelector('.p-nama').value = pg.nama;
+        card.querySelector('.p-nip').value = pg.nip;
+        card.querySelector('.p-pangkat').value = pg.pangkat;
+        card.querySelector('.p-jabatan').value = pg.jabatan;
+        card.querySelector('.p-sbu').value = pg.sbu || "Gol III";
+        card.querySelector('.p-uh-rate').value = getTarifUangHarian();
+        const hotelLimit = getTarifHotelBySBU(findTarifHotelTujuan(), pg.sbu || card.querySelector('.p-sbu').value);
+        card.querySelector('.p-hotel-limit').value = hotelLimit;
+        const mode = card.querySelector('.p-ambil30').value;
+        updateHotelCalculationDisplay(card, mode === 'Ya' || mode === 'Campuran');
+        card.querySelector('.p-save-master').checked = false;
+        refreshPenerimaKwitansiOptions();
+        updateFormGrandTotal();
+      }
+    }
+
+    function handlePersonelSBUChange(selectEl) {
+      const card = selectEl.closest('.personel-card');
+      const limit = getTarifHotelBySBU(findTarifHotelTujuan(), selectEl.value);
+      card.querySelector('.p-hotel-limit').value = limit;
+      const mode = card.querySelector('.p-ambil30').value;
+      updateHotelCalculationDisplay(card, mode === 'Ya' || mode === 'Campuran');
+      updateFormGrandTotal();
+    }
+
+    function removePersonelRow(btn) {
+      const cards = document.querySelectorAll('.personel-card');
+      if (cards.length <= 1) {
+        showToast("Minimal harus ada 1 personel dalam Surat Tugas.", "⚠️");
+        return;
+      }
+      btn.closest('.personel-card').remove();
+      renumberPersonelCards();
+      refreshPenerimaKwitansiOptions();
+      updateFormGrandTotal();
+    }
+
+    function renumberPersonelCards() {
+      document.querySelectorAll('.personel-card').forEach((card, i) => {
+        card.querySelector('.personel-badge').textContent = "Personel #" + (i + 1);
+      });
+    }
+
+    function updateFormGrandTotal() {
+      let grand = 0;
+      document.querySelectorAll('.personel-card').forEach(card => {
+        const uh = (Number(card.querySelector('.p-uh-rate').value) || 0) * (Number(card.querySelector('.p-uh-days').value) || 0);
+        const bimtek = (Number(card.querySelector('.p-bimtek-rate').value) || 0) * (Number(card.querySelector('.p-bimtek-days').value) || 0);
+        const rep = (Number(card.querySelector('.p-rep-rate').value) || 0) * (Number(card.querySelector('.p-rep-days').value) || 0);
+        const hotel = Number(card.querySelector('.p-hotel-total').value) || 0;
+        const taksi = Number(card.querySelector('.p-taksi-total').value) || 0;
+        const darat = Number(card.querySelector('.p-darat-total').value) || 0;
+        const udara = Number(card.querySelector('.p-udara-total').value) || 0;
+        const kapal = Number(card.querySelector('.p-kapal-total').value) || 0;
+        const toll = Number(card.querySelector('.p-toll-total').value) || 0;
+        const biayaLain = Number(card.querySelector('.p-biaya-lain-total').value) || 0;
+        const sub = uh + bimtek + rep + hotel + taksi + darat + udara + kapal + toll + biayaLain;
+        card.querySelector('.p-subtotal').textContent = formatRupiah(sub);
+        grand += sub;
+      });
+      document.getElementById('formGrandTotal').textContent = formatRupiah(grand);
+    }
+
+    function generateNumberedSPD(baseNo, index, totalCount) {
+      if (!baseNo || !baseNo.trim()) return "";
+      if (totalCount <= 1) return baseNo;
+      const suffix = String.fromCharCode(97 + index); // a, b, c...
+      const parts = baseNo.split("/");
+      if (parts.length >= 2) {
+        parts[1] = parts[1].trim() + suffix;
+        return parts.join("/");
+      }
+      return baseNo + "-" + suffix;
+    }
+
+    function saveSTForm() {
+      const noSTInput = document.getElementById('fNoST').value.trim();
+      const noSPDInput = document.getElementById('fNoSPDBase').value.trim();
+      const nomorTanggal = document.getElementById('fTglST').value;
+      const noST = noSTInput ? buildSTNumber(noSTInput, nomorTanggal) : "";
+      const noSPDBase = noSPDInput ? buildSPDNumber(noSPDInput, nomorTanggal) : "";
+      const maksud = document.getElementById('fMaksud').value.trim();
+      if (!maksud) {
+        showToast("Maksud Perjalanan Dinas wajib diisi!", "⚠️");
+        return;
+      }
+
+      const cards = Array.from(document.querySelectorAll('.personel-card'));
+      const personelData = [];
+      let masterAdded = 0;
+
+      cards.forEach((card, idx) => {
+        const nama = card.querySelector('.p-nama').value.trim();
+        const nip = card.querySelector('.p-nip').value.trim();
+        const pangkat = card.querySelector('.p-pangkat').value.trim();
+        const jabatan = card.querySelector('.p-jabatan').value.trim();
+        const sbu = card.querySelector('.p-sbu').value;
+        const manualNoSPD = card.querySelector('.p-nospd').value.trim();
+        const noSPD = manualNoSPD || generateNumberedSPD(noSPDBase, idx, cards.length);
+
+        if (!nama) return;
+
+        // Simpan otomatis ke Data Master Pegawai jika dicentang
+        if (card.querySelector('.p-save-master').checked && nip) {
+          const existIdx = pegawaiList.findIndex(x => x.nip === nip);
+          const oldMaster = existIdx >= 0 ? pegawaiList[existIdx] : {};
+          const objPegawai = {
+            ...oldMaster, nip, nama, pangkat, jabatan, sbu,
+            alamat: oldMaster.alamat || "Lahat",
+            npwp: oldMaster.npwp || "",
+            bank: oldMaster.bank || "Sumsel Babel Cabang Lahat",
+            norek: oldMaster.norek || "",
+          };
+          if (existIdx >= 0) {
+            pegawaiList[existIdx] = objPegawai;
+          } else {
+            pegawaiList.push(objPegawai);
+            masterAdded++;
+          }
+        }
+
+        personelData.push({
+          noSPD,
+          nama,
+          nip,
+          pangkat,
+          jabatan,
+          sbu,
+          uhPerHari: Number(card.querySelector('.p-uh-rate').value) || 0,
+          uhHari: Number(card.querySelector('.p-uh-days').value) || 0,
+          bimtekPerHari: Number(card.querySelector('.p-bimtek-rate').value) || 0,
+          bimtekHari: Number(card.querySelector('.p-bimtek-days').value) || 0,
+          repPerHari: Number(card.querySelector('.p-rep-rate').value) || 0,
+          repHari: Number(card.querySelector('.p-rep-days').value) || 0,
+          ambil30Persen: card.querySelector('.p-ambil30').value,
+          hotelLimitPerMalam: Number(card.querySelector('.p-hotel-limit').value) || 0,
+          hotelMalam: getJumlahMalamPenginapan(),
+          hotelBillMalam: Number(card.querySelector('.p-hotel-bill-malam').value) || 0,
+          hotelBillNominal: Number(card.querySelector('.p-hotel-bill-nominal').value) || 0,
+          hotelTotal: Number(card.querySelector('.p-hotel-total').value) || 0,
+          hotelNama: card.querySelector('.p-hotel-nama').value.trim(),
+          hotelKamar: card.querySelector('.p-hotel-kamar').value.trim(),
+          taksiTotal: Number(card.querySelector('.p-taksi-total').value) || 0,
+          daratTotal: Number(card.querySelector('.p-darat-total').value) || 0,
+          daratPlat: card.querySelector('.p-darat-plat').value.trim(),
+          udaraTotal: Number(card.querySelector('.p-udara-total').value) || 0,
+          udaraMaskapai: card.querySelector('.p-udara-maskapai').value.trim(),
+          udaraBooking: card.querySelector('.p-udara-booking').value.trim(),
+          airTotal: Number(card.querySelector('.p-kapal-total').value) || 0,
+          kapalTotal: Number(card.querySelector('.p-kapal-total').value) || 0,
+          kapalTiket: card.querySelector('.p-kapal-tiket').value.trim(),
+          tollTotal: Number(card.querySelector('.p-toll-total').value) || 0,
+          tollKeterangan: card.querySelector('.p-toll-keterangan').value.trim(),
+          biayaLainTotal: Number(card.querySelector('.p-biaya-lain-total').value) || 0,
+          biayaLainKeterangan: card.querySelector('.p-biaya-lain-keterangan').value.trim()
+        });
+      });
+
+      if (personelData.length === 0) {
+        showToast("Minimal isi 1 nama personel pelaksana!", "⚠️");
+        return;
+      }
+
+      const editId = document.getElementById('editStId').value;
+      const stObj = {
+        id: editId || ("st-" + Date.now()),
+        kategori: document.getElementById('fKategori').value,
+        noST,
+        noSPDBase,
+        jenisPerjadin: document.getElementById('fJenisPerjadin').value,
+        tglST: document.getElementById('fTglST').value,
+        tglBerangkat: document.getElementById('fTglBerangkat').value,
+        tglKembali: document.getElementById('fTglKembali').value,
+        lamaHari: Number(document.getElementById('fLamaHari').value) || 1,
+        asal: document.getElementById('fAsal').value.trim(),
+        tujuanInstansi: document.getElementById('fTujuanInstansi').value.trim(),
+        tujuanKota: document.getElementById('fTujuanKota').value.trim(),
+        tujuanProv: document.getElementById('fTujuanProv').value.trim(),
+        mataAnggaran: document.getElementById('fMataAnggaran').value.trim(),
+        dasar: document.getElementById('fDasar').value.trim(),
+        alatAngkut: document.getElementById('fAlatAngkut').value,
+        maksud,
+        ttdST: document.getElementById('fTtdST').value,
+        ttdSPD: document.getElementById('fTtdSPD').value,
+        ttdPPTK: document.getElementById('fTtdPPTK').value,
+        ttdBendahara: document.getElementById('fTtdBendahara').value,
+        penerimaKwitansiIdx: Number(document.getElementById('fPenerimaKwitansiIdx').value) || 0,
+        noBuktiKwt: document.getElementById('fNoBuktiKwt').value.trim(),
+        subKegiatan: document.getElementById('fSubKegiatan').value.trim(),
+        rekGiroSKPD: document.getElementById('fRekGiroSKPD').value.trim(),
+        kwtNpwp: document.getElementById('fKwtNpwp').value.trim(),
+        kwtBank: document.getElementById('fKwtBank').value.trim(),
+        kwtNorek: document.getElementById('fKwtNorek').value.trim(),
+        umPersen: document.getElementById('fUmPersen').value,
+        personel: personelData
+      };
+
+      if (editId) {
+        const idx = stList.findIndex(x => x.id === editId);
+        if (idx >= 0) stList[idx] = stObj;
+      } else {
+        stList.unshift(stObj);
+      }
+
+      saveLocalState(true);
+      renderMasterTables();
+      renderDashboard();
+      switchTab('dashboard');
+      showToast(masterAdded > 0 ? "ST disimpan & " + masterAdded + " personel baru ditambahkan ke Master!" : "Surat Tugas & SPJ berhasil disimpan!", "✅");
+    }
+
+    // =========================================================
+    // MASTER DATA PEGAWAI & PEJABAT CRUD
+    // =========================================================
+    function renderMasterTables() {
+      const q = (document.getElementById('searchMasterPegawai').value || "").toLowerCase();
+      const sbuFilter = document.getElementById('filterMasterSBU').value;
+
+      const filteredPg = pegawaiList.filter(pg => {
+        if (sbuFilter !== "ALL" && pg.sbu !== sbuFilter) return false;
+        if (q && !(pg.nama + " " + pg.nip + " " + pg.jabatan).toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      const pgBody = document.getElementById('masterPegawaiBody');
+      pgBody.innerHTML = filteredPg.map((pg, i) =>
+        '<tr class="hover:bg-slate-50">' +
+          '<td class="py-2.5 px-3 text-slate-500">' + (i + 1) + '</td>' +
+          '<td class="py-2.5 px-3 font-semibold text-slate-900">' + pg.nama + '</td>' +
+          '<td class="py-2.5 px-3 font-mono text-xs text-slate-600">' + pg.nip + '</td>' +
+          '<td class="py-2.5 px-3 text-xs">' + pg.pangkat + '</td>' +
+          '<td class="py-2.5 px-3 text-xs">' + pg.jabatan + '</td>' +
+          '<td class="py-2.5 px-3"><span class="text-[11px] bg-slate-100 border border-slate-300 px-2 py-0.5 rounded font-semibold">' + pg.sbu + '</span></td>' +
+          '<td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1">' +
+            '<button onclick="openPegawaiModal(\'' + pg.nip + '\')" class="px-2 py-1 text-xs bg-amber-500 text-white rounded font-semibold">Edit</button>' +
+            '<button onclick="deletePegawai(\'' + pg.nip + '\')" class="px-2 py-1 text-xs bg-rose-600 text-white rounded font-semibold">Hapus</button>' +
+          '</td>' +
+        '</tr>'
+      ).join("");
+
+      renderTarifTable();
+
+      const pjBody = document.getElementById('masterPejabatBody');
+      pjBody.innerHTML = pejabatList.map((pj, i) =>
+        '<tr class="hover:bg-slate-50">' +
+          '<td class="py-2.5 px-3 text-slate-500">' + (i + 1) + '</td>' +
+          '<td class="py-2.5 px-3 text-xs whitespace-pre-line font-medium text-slate-700">' + pj.label + '</td>' +
+          '<td class="py-2.5 px-3 font-bold text-slate-900">' + pj.nama + '</td>' +
+          '<td class="py-2.5 px-3 text-xs">' + pj.pangkat + '</td>' +
+          '<td class="py-2.5 px-3 font-mono text-xs">' + pj.nip + '</td>' +
+          '<td class="py-2.5 px-3 text-center whitespace-nowrap space-x-1">' +
+            '<button onclick="openPejabatModal(\'' + pj.id + '\')" class="px-2 py-1 text-xs bg-amber-500 text-white rounded font-semibold">Edit</button>' +
+            '<button onclick="deletePejabat(\'' + pj.id + '\')" class="px-2 py-1 text-xs bg-rose-600 text-white rounded font-semibold">Hapus</button>' +
+          '</td>' +
+        '</tr>'
+      ).join("");
+    }
+
+    function renderTarifTable() {
+      const body = document.getElementById('masterTarifBody');
+      if (!body) return;
+      body.innerHTML = tarifList.map((t, i) =>
+        '<tr><td class="p-2">' + (i + 1) + '</td><td class="p-2 font-semibold">' + t.kota + '<div class="text-slate-500">' + (t.provinsi || '') + '</div></td><td class="p-2">' + t.kategori + '</td>' +
+        '<td class="p-2 text-right">' + formatRupiah(t.uangHarian || 0) + '</td><td class="p-2 text-right">' + formatRupiah(t.hotelEselonII || 0) + '</td>' +
+        '<td class="p-2 text-right">' + formatRupiah(t.hotelEselonIII || 0) + '</td><td class="p-2 text-right">' + formatRupiah(t.hotelEselonIV || 0) + '</td>' +
+        '<td class="p-2 text-right">' + formatRupiah(t.hotelGolII || 0) + '</td><td class="p-2 text-right">' + formatRupiah(t.hotelNonASN || 0) + '</td><td class="p-2 whitespace-nowrap"><button data-id="' + t.id + '" onclick="editTarif(this.dataset.id)" class="px-2 py-1 bg-amber-500 text-white rounded">Edit</button> <button data-id="' + t.id + '" onclick="deleteTarif(this.dataset.id)" class="px-2 py-1 bg-rose-600 text-white rounded">Hapus</button></td></tr>'
+      ).join('');
+    }
+
+    function clearTarifForm() {
+      ['tarifEditId','tfKota','tfProvinsi','tfUangHarian','tfHotelEselonII','tfHotelEselonIII','tfHotelEselonIV','tfHotelGolII','tfHotelNonASN'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('tfKategori').value = 'Luar Daerah (Dalam Provinsi)';
+    }
+
+    function saveTarifForm() {
+      const kota = document.getElementById('tfKota').value.trim();
+      const provinsi = document.getElementById('tfProvinsi').value.trim();
+      const kategori = document.getElementById('tfKategori').value;
+      const uangHarian = Number(document.getElementById('tfUangHarian').value) || 0;
+      if (!kota || !provinsi || uangHarian <= 0) { showToast('Kota, provinsi, dan uang harian wajib diisi.', '⚠️'); return; }
+      const id = document.getElementById('tarifEditId').value || ('tarif-' + Date.now());
+      const obj = { id, kota, provinsi, kategori, uangHarian,
+        hotelEselonII: Number(document.getElementById('tfHotelEselonII').value) || 0,
+        hotelEselonIII: Number(document.getElementById('tfHotelEselonIII').value) || 0,
+        hotelEselonIV: Number(document.getElementById('tfHotelEselonIV').value) || 0,
+        hotelGolII: Number(document.getElementById('tfHotelGolII').value) || 0,
+        hotelNonASN: Number(document.getElementById('tfHotelNonASN').value) || 0 };
+      const idx = tarifList.findIndex(x => x.id === id);
+      if (idx >= 0) tarifList[idx] = obj; else tarifList.push(obj);
+      saveLocalState(true); renderTarifTable(); clearTarifForm();
+      showToast('Tarif tujuan berhasil disimpan.', '✅');
+    }
+
+    function editTarif(id) {
+      const t = tarifList.find(x => x.id === id); if (!t) return;
+      document.getElementById('tarifEditId').value = t.id;
+      document.getElementById('tfKota').value = t.kota || '';
+      document.getElementById('tfProvinsi').value = t.provinsi || '';
+      document.getElementById('tfKategori').value = t.kategori || 'Luar Daerah (Dalam Provinsi)';
+      document.getElementById('tfUangHarian').value = t.uangHarian || 0;
+      document.getElementById('tfHotelEselonII').value = t.hotelEselonII || 0;
+      document.getElementById('tfHotelEselonIII').value = t.hotelEselonIII || 0;
+      document.getElementById('tfHotelEselonIV').value = t.hotelEselonIV || 0;
+      document.getElementById('tfHotelGolII').value = t.hotelGolII || 0;
+      document.getElementById('tfHotelNonASN').value = t.hotelNonASN || 0;
+      document.getElementById('tfKota').focus();
+    }
+
+    function deleteTarif(id) {
+      if (!confirm('Hapus tarif tujuan ini?')) return;
+      tarifList = tarifList.filter(x => x.id !== id);
+      saveLocalState(true); renderTarifTable();
+      showToast('Tarif tujuan dihapus.', '🗑️');
+    }
+
+    function openPegawaiModal(nip = null) {
+      const modal = document.getElementById('modalPegawai');
+      if (nip) {
+        const pg = pegawaiList.find(x => x.nip === nip);
+        if (!pg) return;
+        document.getElementById('modalPegawaiTitle').textContent = "Edit Data Pegawai";
+        document.getElementById('mpOldNip').value = pg.nip;
+        document.getElementById('mpNama').value = pg.nama;
+        document.getElementById('mpNip').value = pg.nip;
+        document.getElementById('mpPangkat').value = pg.pangkat;
+        document.getElementById('mpJabatan').value = pg.jabatan;
+        document.getElementById('mpSbu').value = pg.sbu || "Gol III";
+        document.getElementById('mpNpwp').value = pg.npwp || "";
+        document.getElementById('mpBank').value = pg.bank || "Sumsel Babel Cabang Lahat";
+        document.getElementById('mpNorek').value = pg.norek || "";
+      } else {
+        document.getElementById('modalPegawaiTitle').textContent = "Tambah Pegawai Baru";
+        document.getElementById('mpOldNip').value = "";
+        document.getElementById('mpNama').value = "";
+        document.getElementById('mpNip').value = "";
+        document.getElementById('mpPangkat').value = "";
+        document.getElementById('mpJabatan').value = "";
+        document.getElementById('mpSbu').value = "Gol III";
+        document.getElementById('mpNpwp').value = "";
+        document.getElementById('mpBank').value = "Sumsel Babel Cabang Lahat";
+        document.getElementById('mpNorek').value = "";
+      }
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePegawaiModal() {
+      const modal = document.getElementById('modalPegawai');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function savePegawaiModal() {
+      const oldNip = document.getElementById('mpOldNip').value;
+      const nama = document.getElementById('mpNama').value.trim();
+      const nip = document.getElementById('mpNip').value.trim();
+      const pangkat = document.getElementById('mpPangkat').value.trim();
+      const jabatan = document.getElementById('mpJabatan').value.trim();
+      const sbu = document.getElementById('mpSbu').value;
+      const npwp = document.getElementById('mpNpwp').value.trim();
+      const bank = document.getElementById('mpBank').value.trim();
+      const norek = document.getElementById('mpNorek').value.trim();
+
+      if (!nama || !nip) {
+        showToast("Nama dan NIP/NRP wajib diisi!", "⚠️");
+        return;
+      }
+
+      const obj = {
+        nip, nama, pangkat, jabatan, sbu, alamat: "Lahat", npwp, bank, norek,
+      };
+      if (oldNip) {
+        const idx = pegawaiList.findIndex(x => x.nip === oldNip);
+        if (idx >= 0) pegawaiList[idx] = obj;
+      } else {
+        pegawaiList.unshift(obj);
+      }
+
+      saveLocalState(true);
+      renderMasterTables();
+      closePegawaiModal();
+      showToast("Data Master Pegawai berhasil disimpan!", "✅");
+    }
+
+    function deletePegawai(nip) {
+      if (!confirm("Hapus pegawai ini dari Data Master?")) return;
+      pegawaiList = pegawaiList.filter(x => x.nip !== nip);
+      saveLocalState(true);
+      renderMasterTables();
+      showToast("Pegawai dihapus dari Data Master", "🗑️");
+    }
+
+    function openPejabatModal(id = null) {
+      const modal = document.getElementById('modalPejabat');
+      if (id) {
+        const pj = pejabatList.find(x => x.id === id);
+        if (!pj) return;
+        document.getElementById('modalPejabatTitle').textContent = "Edit Pejabat Penandatangan";
+        document.getElementById('mpjId').value = pj.id;
+        document.getElementById('mpjLabel').value = pj.label;
+        document.getElementById('mpjNama').value = pj.nama;
+        document.getElementById('mpjPangkat').value = pj.pangkat;
+        document.getElementById('mpjNip').value = pj.nip;
+      } else {
+        document.getElementById('modalPejabatTitle').textContent = "Tambah Pejabat Penandatangan";
+        document.getElementById('mpjId').value = "";
+        document.getElementById('mpjLabel').value = "KEPALA BADAN PENDAPATAN DAERAH\nKABUPATEN LAHAT";
+        document.getElementById('mpjNama').value = "";
+        document.getElementById('mpjPangkat').value = "";
+        document.getElementById('mpjNip').value = "";
+      }
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePejabatModal() {
+      const modal = document.getElementById('modalPejabat');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function savePejabatModal() {
+      const id = document.getElementById('mpjId').value;
+      const label = document.getElementById('mpjLabel').value.trim();
+      const nama = document.getElementById('mpjNama').value.trim();
+      const pangkat = document.getElementById('mpjPangkat').value.trim();
+      const nip = document.getElementById('mpjNip').value.trim();
+
+      if (!label || !nama) {
+        showToast("Label jabatan dan nama pejabat wajib diisi!", "⚠️");
+        return;
+      }
+
+      const obj = { id: id || ("pj-" + Date.now()), label, nama, pangkat, nip };
+      if (id) {
+        const idx = pejabatList.findIndex(x => x.id === id);
+        if (idx >= 0) pejabatList[idx] = obj;
+      } else {
+        pejabatList.push(obj);
+      }
+
+      saveLocalState(true);
+      populatePejabatSelects();
+      renderMasterTables();
+      closePejabatModal();
+      showToast("Data Pejabat Penandatangan disimpan!", "✅");
+    }
+
+    function deletePejabat(id) {
+      if (pejabatList.length <= 1) {
+        showToast("Minimal harus tersisa 1 pejabat penandatangan.", "⚠️");
+        return;
+      }
+      if (!confirm("Hapus pejabat penandatangan ini?")) return;
+      pejabatList = pejabatList.filter(x => x.id !== id);
+      saveLocalState(true);
+      populatePejabatSelects();
+      renderMasterTables();
+      showToast("Pejabat penandatangan dihapus", "🗑️");
+    }
+
+    function resetDefaultMaster() {
+      if (!confirm("Kembalikan Data Master Pegawai & Pejabat ke daftar bawaan Bapenda Lahat?")) return;
+      pegawaiList = JSON.parse(JSON.stringify(DEFAULT_PEGAWAI));
+      pejabatList = JSON.parse(JSON.stringify(DEFAULT_PEJABAT));
+      saveLocalState(true);
+      populatePejabatSelects();
+      renderMasterTables();
+      showToast("Data Master berhasil di-reset ke bawaan", "🔄");
+    }
+
+    // =========================================================
+    // PRINT & DOCUMENT GENERATOR (ST, SPD DEPAN/BELAKANG, SPJ)
+    // =========================================================
+    function quickPrintST(stId) {
+      switchTab('print');
+      document.getElementById('printSelectST').value = stId;
+      renderPrintDocuments();
+    }
+
+    function populatePrintSelect() {
+      const sel = document.getElementById('printSelectST');
+      const currentVal = sel.value;
+      sel.innerHTML = stList.map(st =>
+        '<option value="' + st.id + '">' + (st.noST || '(Belum bernomor)') + ' — ' + st.maksud.slice(0, 50) + '...</option>'
+      ).join("");
+      if (currentVal && stList.some(x => x.id === currentVal)) {
+        sel.value = currentVal;
+      }
+    }
+
+    function getKopSuratHTML() {
+      return '<div style="display:flex; align-items:center; border-bottom: 3px double #000; padding-bottom: 8px; margin-bottom: 14px;">' +
+        '<div style="width:68px; flex-shrink:0; text-align:center;">' +
+          '<img src="https://lh3.googleusercontent.com/d/1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3" onerror="this.onerror=null; this.src=\'https://drive.google.com/uc?export=view&id=1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3\';" alt="Logo Kabupaten Lahat" style="width:58px; height:66px; object-fit:contain; margin:auto;" />' +
+        '</div>' +
+        '<div style="flex:1; text-align:center; line-height:1.25;">' +
+          '<div style="font-size:14pt; font-weight:bold; letter-spacing:0.5px;">PEMERINTAH KABUPATEN LAHAT</div>' +
+          '<div style="font-size:17pt; font-weight:bold; letter-spacing:1px;">BADAN PENDAPATAN DAERAH</div>' +
+          '<div style="font-size:9.5pt;">Jl. Letnan Amir Hamzah, Kelurahan Pasar Baru, Kecamatan Lahat, Kabupaten Lahat, Provinsi Sumatera Selatan</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderPrintDocuments() {
+      const area = document.getElementById('printArea');
+      const stId = document.getElementById('printSelectST').value;
+      const docType = document.getElementById('printDocType').value;
+      const st = stList.find(x => x.id === stId);
+
+      if (!st) {
+        area.innerHTML = '<div class="bg-white p-8 rounded-xl text-center text-slate-400">Tidak ada Surat Tugas untuk dicetak.</div>';
+        return;
+      }
+
+      const pjST = pejabatList.find(x => x.id === st.ttdST) || pejabatList[0];
+      const pjSPD = pejabatList.find(x => x.id === st.ttdSPD) || pejabatList[0];
+      const pjBendahara = pejabatList.find(x => x.id === st.ttdBendahara) || pejabatList[pejabatList.length - 1];
+
+      let html = "";
+
+      // 1. SURAT TUGAS (ST)
+      if (docType === "ALL" || docType === "ST") {
+        const daftarKepada = (st.personel || []).map((p, idx) =>
+          '<tr>' +
+            '<td style="width:28px; vertical-align:top; padding:2px 0;">' + (idx + 1) + '.</td>' +
+            '<td style="width:130px; vertical-align:top; padding:2px 0;">Nama</td>' +
+            '<td style="width:12px; vertical-align:top; padding:2px 0;">:</td>' +
+            '<td style="vertical-align:top; padding:2px 0; font-weight:bold;">' + p.nama + '</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td></td><td style="padding:1px 0;">Pangkat / Golongan</td><td>:</td><td style="padding:1px 0;">' + (p.pangkat || '-') + '</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td></td><td style="padding:1px 0;">NIP / NRP</td><td>:</td><td style="padding:1px 0;">' + (p.nip || '-') + '</td>' +
+          '</tr>' +
+          '<tr>' +
+            '<td></td><td style="padding:1px 0 6px 0;">Jabatan</td><td>:</td><td style="padding:1px 0 6px 0;">' + (p.jabatan || '-') + '</td>' +
+          '</tr>'
+        ).join("");
+
+        html += '<div class="print-sheet doc-font bg-white shadow-md border border-slate-300 max-w-[215mm] mx-auto p-10 text-[11.5pt] leading-snug text-black">' +
+          getKopSuratHTML() +
+          '<div style="text-align:center; margin: 14px 0 18px 0;">' +
+            '<div style="font-size:14pt; font-weight:bold; text-decoration:underline; letter-spacing:3px;">SURAT TUGAS</div>' +
+            '<div style="font-size:11.5pt; margin-top:2px;">Nomor : ' + formatSTNumberHTML(st) + '</div>' +
+          '</div>' +
+
+          '<table style="width:100%; border-collapse:collapse; margin-bottom:14px;">' +
+            '<tr>' +
+              '<td style="width:85px; vertical-align:top; font-weight:bold;">Dasar</td>' +
+              '<td style="width:15px; vertical-align:top;">:</td>' +
+              '<td style="vertical-align:top; text-align:justify;">' + st.dasar + '</td>' +
+            '</tr>' +
+          '</table>' +
+
+          '<div style="text-align:center; font-weight:bold; letter-spacing:2px; margin: 14px 0;">MEMERINTAHKAN</div>' +
+
+          '<table style="width:100%; border-collapse:collapse; margin-bottom:14px;">' +
+            '<tr>' +
+              '<td style="width:85px; vertical-align:top; font-weight:bold;">Kepada</td>' +
+              '<td style="width:15px; vertical-align:top;">:</td>' +
+              '<td style="vertical-align:top;">' +
+                '<table style="width:100%; border-collapse:collapse;">' + daftarKepada + '</table>' +
+              '</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td style="vertical-align:top; font-weight:bold; padding-top:8px;">Untuk</td>' +
+              '<td style="vertical-align:top; padding-top:8px;">:</td>' +
+              '<td style="vertical-align:top; padding-top:8px; text-align:justify;">' + st.maksud + ' ke ' + st.tujuanInstansi + ' ' +  ' pada tanggal ' + formatTanggalIndo(st.tglBerangkat) + (st.tglBerangkat !== st.tglKembali ? ' s.d. ' + formatTanggalIndo(st.tglKembali) + ' di ' + st.tujuanKota + ' Provinsi ' + st.tujuanProv : '') + '.</td>' +
+            '</tr>' +
+          '</table>' +
+
+          '<p style="text-indent:36px; text-align:justify; margin:14px 0 24px 0;">Demikian Surat Tugas ini dibuat untuk dapat dilaksanakan dengan baik dan penuh rasa tanggung jawab.</p>' +
+
+          '<div style="display:flex; justify-content:flex-end;">' +
+            '<div style="width:310px; text-align:left;">' +
+              '<div>Dikeluarkan di : ' + (st.asal || 'Lahat') + '</div>' +
+              '<div style="border-bottom:1px solid #000; padding-bottom:4px; margin-bottom:8px;">Pada tanggal &nbsp;&nbsp;: ' + formatTanggalIndo(st.tglST) + '</div>' +
+              '<div style="font-weight:bold; white-space:pre-line;">' + pjST.label + '</div>' +
+              '<div style="height:64px;"></div>' +
+              '<div style="font-weight:bold; text-decoration:underline;">' + pjST.nama + '</div>' +
+              '<div>' + pjST.pangkat + '</div>' +
+              '<div>NIP. ' + pjST.nip + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }
+
+      // 2. SPD HALAMAN DEPAN (PER PERSONEL)
+      if (docType === "ALL" || docType === "SPD_FRONT") {
+        (st.personel || []).forEach(p => {
+          html += '<div class="print-sheet doc-font bg-white shadow-md border border-slate-300 max-w-[215mm] mx-auto p-10 text-[10.5pt] leading-snug text-black">' +
+            getKopSuratHTML() +
+            '<div style="display:flex; justify-content:flex-end; margin-bottom:8px;">' +
+              '<table style="font-size:10pt;">' +
+                '<tr><td style="width:85px;">Lembar ke</td><td>:  </td></tr>' +
+                '<tr><td>Kode No</td><td>: -</td></tr>' +
+                '<tr><td>Nomor</td><td>: <strong>' + formatSPDNumberHTML(p, st) + '</strong></td></tr>' +
+              '</table>' +
+            '</div>' +
+
+            '<div style="text-align:center; margin-bottom:12px;">' +
+              '<div style="font-size:13pt; font-weight:bold; text-decoration:underline;">SURAT PERJALANAN DINAS (SPD)</div>' +
+            '</div>' +
+
+            '<table class="doc-table" style="font-size:10.5pt;">' +
+              '<tr><td style="width:28px; text-align:center;">1.</td><td style="width:260px;">Pejabat yang berwenang memberi perintah</td><td colspan="2"><strong>KEPALA BAPENDA KAB. LAHAT</strong></td></tr>' +
+              '<tr><td style="text-align:center;">2.</td><td>Nama / NIP Pegawai yang diperintahkan</td><td colspan="2"><strong>' + p.nama + '</strong><br/>NIP. ' + (p.nip || '-') + '</td></tr>' +
+              '<tr><td style="text-align:center;">3.</td><td>a. Pangkat dan Golongan<br/>b. Jabatan / Instansi<br/>c. Tingkat menurut peraturan perjalanan dinas</td><td colspan="2">a. ' + (p.pangkat || '-') + '<br/>b. ' + (p.jabatan || '-') + ' / Bapenda Kab. Lahat<br/>c. ' + (p.sbu || '-') + '</td></tr>' +
+              '<tr><td style="text-align:center;">4.</td><td>Maksud Perjalanan Dinas</td><td colspan="2">' + st.maksud + '</td></tr>' +
+              '<tr><td style="text-align:center;">5.</td><td>Alat angkut yang digunakan</td><td colspan="2">' + (st.alatAngkut || 'Angkutan Darat') + '</td></tr>' +
+              '<tr><td style="text-align:center;">6.</td><td>a. Tempat Berangkat<br/>b. Tempat Tujuan</td><td colspan="2">a. ' + (st.asal || 'Lahat') + '<br/>b. ' + st.tujuanInstansi + ' (' + st.tujuanKota + ')</td></tr>' +
+              '<tr><td style="text-align:center;">7.</td><td>a. Lamanya Perjalanan Dinas<br/>b. Tanggal Berangkat<br/>c. Tanggal Kembali</td><td colspan="2">a. ' + st.lamaHari + ' (' + terbilang(st.lamaHari).replace(" Rupiah", "").toLowerCase() + ') hari<br/>b. ' + formatTanggalIndo(st.tglBerangkat) + '<br/>c. ' + formatTanggalIndo(st.tglKembali) + '</td></tr>' +
+              '<tr><td style="text-align:center;">8.</td><td>Pengikut : Nama</td><td style="width:130px; text-align:center;">Tanggal Lahir</td><td style="text-align:center;">Keterangan</td></tr>' +
+              '<tr><td></td><td style="height:28px;">-</td><td>-</td><td>-</td></tr>' +
+              '<tr><td style="text-align:center;">9.</td><td>Pembebanan Anggaran<br/>a. Instansi<br/>b. Mata Anggaran</td><td colspan="2"><br/>a. Badan Pendapatan Daerah Kabupaten Lahat<br/>b. ' + (st.mataAnggaran || '5.1.02.04.01.0001') + '</td></tr>' +
+              '<tr><td style="text-align:center;">10.</td><td>Keterangan Lain-lain</td><td colspan="2"></td></tr>' +
+            '</table>' +
+
+            '<div style="display:flex; justify-content:flex-end; margin-top:18px;">' +
+              '<div style="width:300px;">' +
+                '<div>Dikeluarkan di : ' + (st.asal || 'Lahat') + '</div>' +
+                '<div style="border-bottom:1px solid #000; padding-bottom:3px; margin-bottom:6px;">Pada tanggal &nbsp;&nbsp;: ' + formatTanggalIndo(st.tglST) + '</div>' +
+                '<div style="font-weight:bold;">PENGGUNA ANGGARAN / PPK</div>' +
+                '<div style="height:56px;"></div>' +
+                '<div style="font-weight:bold; text-decoration:underline;">' + pjSPD.nama + '</div>' +
+                '<div>' + pjSPD.pangkat + '</div>' +
+                '<div>NIP. ' + pjSPD.nip + '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+      }
+
+      // 3. SPD HALAMAN BELAKANG (PENGESAHAN I - VIII)
+      if (docType === "ALL" || docType === "SPD_BACK") {
+        html += '<div class="print-sheet doc-font bg-white shadow-md border border-slate-300 max-w-[215mm] mx-auto p-10 text-[9.5pt] leading-snug text-black">' +
+          '<table class="doc-table">' +
+            '<tr>' +
+              '<td style="width:50%; height:110px;"></td>' +
+              '<td style="width:50%;">' +
+                'I. Berangkat dari : ' + (st.asal || 'Lahat') + '<br/>' +
+                '&nbsp;&nbsp;&nbsp;(Tempat Kedudukan)<br/>' +
+                '&nbsp;&nbsp;&nbsp;Ke : ' + st.tujuanKota + '<br/>' +
+                '&nbsp;&nbsp;&nbsp;Pada Tanggal : ' + formatTanggalIndo(st.tglBerangkat) + '<br/><br/>' +
+                '<div style="text-align:center; font-weight:bold;">' + (pjSPD.label.includes("Plt") ? pjSPD.label : 'KEPALA BAPENDA KAB. LAHAT') + '<br/><br/><br/><br/>' +
+                '<u>' + pjSPD.nama + '</u><br/>NIP. ' + pjSPD.nip + '</div>' +
+              '</td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td>II. Tiba di : ' + st.tujuanKota + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal : ' + formatTanggalIndo(st.tglBerangkat) + '<br/>&nbsp;&nbsp;&nbsp;&nbsp;Kepala :<br/><br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+              '<td>Berangkat dari : ' + st.tujuanKota + '<br/>Ke : ' + (st.asal || 'Lahat') + '<br/>Pada Tanggal : ' + formatTanggalIndo(st.tglKembali) + '<br/>Kepala :<br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td>III. Tiba di :<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal :<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kepala :<br/><br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+              '<td>Berangkat dari :<br/>Ke :<br/>Pada Tanggal :<br/>Kepala :<br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td>IV. Tiba di :<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal :<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kepala :<br/><br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+              '<td>Berangkat dari :<br/>Ke :<br/>Pada Tanggal :<br/>Kepala :<br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td>V. Tiba di :<br/>&nbsp;&nbsp;&nbsp;&nbsp;Pada Tanggal :<br/>&nbsp;&nbsp;&nbsp;&nbsp;Kepala :<br/><br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+              '<td>Berangkat dari :<br/>Ke :<br/>Pada Tanggal :<br/>Kepala :<br/><br/><br/><div style="text-align:center;">(....................................................)</div></td>' +
+            '</tr>' +
+            '<tr>' +
+              '<td style="height:120px;"></td>' +
+              '<td>Telah diperiksa, dengan keterangan bahwa perjalanan tersebut di atas benar dilakukan atas perintahnya dan semata-mata untuk kepentingan jabatan dalam waktu yang sesingkat-singkatnya.<br/><br/>' +
+                '<div style="text-align:center; font-weight:bold;">PEJABAT PEMBUAT KOMITMEN<br/><br/><br/><br/>' +
+                '<u>' + pjSPD.nama + '</u><br/>NIP. ' + pjSPD.nip + '</div>' +
+              '</td>' +
+            '</tr>' +
+            '<tr><td colspan="2">VII. CATATAN LAIN-LAIN :</td></tr>' +
+            '<tr><td colspan="2">VIII. PERHATIAN :<br/>PPK yang menerbitkan SPD, pegawai yang melakukan perjalanan dinas, para pejabat yang mengesahkan tanggal berangkat/tiba, serta bendahara pengeluaran bertanggung jawab berdasarkan peraturan-peraturan Keuangan Negara apabila negara menderita rugi akibat kesalahan, kelalaian, dan kealpaannya.</td></tr>' +
+          '</table>' +
+        '</div>';
+      }
+
+      // 4. RINCIAN BIAYA PERJALANAN DINAS (SESUAI FORMAT EXCEL RINC WIL I ESELON)
+      const pjPPTK = pejabatList.find(x => x.id === (st.ttdPPTK || "pj-4")) || pejabatList[0];
+      if (docType === "ALL" || docType === "SPJ") {
+        (st.personel || []).forEach(p => {
+          const uhTot = (Number(p.uhPerHari) || 0) * (Number(p.uhHari) || 0);
+          const bimTot = (Number(p.bimtekPerHari) || 0) * (Number(p.bimtekHari) || 0);
+          const repTot = (Number(p.repPerHari) || 0) * (Number(p.repHari) || 0);
+          const hotelTot = Number(p.hotelTotal) || 0;
+          const transTot = (Number(p.daratTotal) || 0) + (Number(p.taksiTotal) || 0);
+          const pesawatTot = Number(p.udaraTotal) || 0;
+          const kapalTot = Number(p.kapalTotal ?? p.airTotal) || 0;
+          const tollTot = Number(p.tollTotal) || 0;
+          const biayaLainTot = Number(p.biayaLainTotal) || 0;
+          const grandP = uhTot + bimTot + repTot + hotelTot + transTot + pesawatTot + kapalTot + tollTot + biayaLainTot;
+
+          const umRatio = Number(st.umPersen) || 0;
+          const umAmount = Math.round(grandP * umRatio);
+          const hotelMalam = Number(p.hotelMalam) || (hotelTot > 0 && st.lamaHari > 1 ? st.lamaHari - 1 : (hotelTot > 0 ? 1 : 0));
+          const hotelRate = hotelMalam > 0 ? Math.round(hotelTot / hotelMalam) : hotelTot;
+          let nomorBarisBiaya = 1;
+          const detailBiayaRows = [];
+          const tambahBarisBiaya = (uraian, jumlah, keterangan, wajib = false) => {
+            if (!wajib && !(Number(jumlah) > 0)) return;
+            detailBiayaRows.push('<tr><td style="text-align:center;">' + (nomorBarisBiaya++) + '</td><td>' + uraian + '</td><td style="text-align:right;">' + (Number(jumlah) > 0 ? formatRupiah(jumlah) : '-') + '</td><td>' + (keterangan || '') + '</td></tr>');
+          };
+          tambahBarisBiaya('Biaya Angkutan / Biaya BBM', transTot, p.daratPlat || '-', true);
+          tambahBarisBiaya('Transport Pesawat (Tiket)', pesawatTot, [p.udaraMaskapai, p.udaraBooking].filter(Boolean).join(' / ') || '-');
+          tambahBarisBiaya('Biaya Tol (sesuai struk)', tollTot, p.tollKeterangan || '-');
+          tambahBarisBiaya('Transport Kapal (Tiket)', kapalTot, p.kapalTiket || '-');
+          tambahBarisBiaya('Uang Harian Biasa &nbsp;: ' + (p.uhHari || 0) + ' Hari x ' + formatRupiah(p.uhPerHari), uhTot, '', true);
+          tambahBarisBiaya('Uang Harian Diklat/Bimtek &nbsp;: ' + (p.bimtekHari || 0) + ' Hari x ' + formatRupiah(p.bimtekPerHari), bimTot, '', false);
+          tambahBarisBiaya('Biaya Penginapan &nbsp;: ' + hotelMalam + ' Malam x ' + formatRupiah(hotelRate), hotelTot, p.ambil30Persen === 'Ya' ? 'Tanpa Bill (30% SBU)' : (p.ambil30Persen === 'Campuran' ? 'Bill + 30% SBU' : (p.hotelNama || 'Dengan Bill')), true);
+          tambahBarisBiaya('Uang Representasi &nbsp;: ' + (p.repHari || 0) + ' Hari x ' + formatRupiah(p.repPerHari), repTot, '', false);
+          tambahBarisBiaya('Biaya Lain-lain' + (p.biayaLainKeterangan ? ' &nbsp;: ' + escapePrintText(p.biayaLainKeterangan) : ''), biayaLainTot, '', false);
+
+          html += '<div class="print-sheet doc-font bg-white shadow-md border border-slate-300 max-w-[215mm] mx-auto p-10 text-[10.5pt] leading-snug text-black">' +
+            // --- BAGIAN KOP HEADER (DITAMBAHKAN LOGO KIRI ATAS) ---
+            '<div style="display:flex; align-items:center; margin-bottom:14px; border-bottom:2px solid #000; padding-bottom:10px;">' +
+              '<img src="https://lh3.googleusercontent.com/d/1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3" alt="Logo Kabupaten Lahat" style="width:65px; height:auto; margin-right:15px;" />' +
+              '<div style="text-align:center; flex-grow:1;">' +
+                '<div style="font-size:13pt; font-weight:bold; text-decoration:underline;">RINCIAN BIAYA PERJALANAN DINAS</div>' +
+                '<div style="font-size:12pt; font-weight:bold;">PEMERINTAH KABUPATEN LAHAT</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<table style="width:100%; margin-bottom:12px; font-size:10pt; border-collapse:collapse;">' +
+              '<tr><td style="width:165px; padding:2px 0;">SKPD</td><td style="width:12px;">:</td><td colspan="2"><strong>BADAN PENDAPATAN DAERAH</strong></td></tr>' +
+              '<tr><td style="padding:2px 0;">No / Tgl Surat Tugas</td><td>:</td><td>' + formatSTNumberHTML(st) + '</td><td style="text-align:right;">Tgl. ' + formatTanggalIndo(st.tglST) + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">No / Tgl SPD</td><td>:</td><td>' + formatSPDNumberHTML(p, st) + '</td><td style="text-align:right;">Tgl. ' + formatTanggalIndo(st.tglST) + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Kode Rek Anggaran</td><td>:</td><td colspan="2">' + (st.mataAnggaran || '5.1.02.04.01.0001') + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Nama</td><td>:</td><td colspan="2"><strong>' + p.nama + '</strong></td></tr>' +
+              '<tr><td style="padding:2px 0;">Nip</td><td>:</td><td colspan="2">' + (p.nip || '-') + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Pangkat / Golongan</td><td>:</td><td colspan="2">' + (p.pangkat || '-') + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Jabatan</td><td>:</td><td colspan="2">' + (p.jabatan || '-') + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Tujuan</td><td>:</td><td colspan="2">' + st.tujuanKota + (st.tujuanInstansi ? ' (' + st.tujuanInstansi + ')' : '') + '</td></tr>' +
+              '<tr><td style="padding:2px 0;">Lamanya Perjalanan</td><td>:</td><td colspan="2">' + st.lamaHari + ' Hari &nbsp;&nbsp; Tanggal, ' + formatTanggalIndo(st.tglBerangkat) + (st.tglBerangkat !== st.tglKembali ? ' s.d ' + formatTanggalIndo(st.tglKembali) : '') + '</td></tr>' +
+            '</table>' +
+
+            '<table class="doc-table" style="margin-bottom:10px; font-size:10pt;">' +
+              '<thead>' +
+                '<tr style="background:#f1f5f9; text-align:center;">' +
+                  '<th style="width:32px;">No</th>' +
+                  '<th>Perincian Biaya</th>' +
+                  '<th style="width:135px;">Jumlah</th>' +
+                  '<th style="width:130px;">Ket</th>' +
+                '</tr>' +
+              '</thead>' +
+              '<tbody>' +
+                detailBiayaRows.join('') +
+                '<tr style="font-weight:bold; background:#f8fafc;">'+
+                  '<td colspan="2" style="text-align:center;">Jumlah</td>' +
+                  '<td style="text-align:right;">' + formatRupiah(grandP) + '</td>' +
+                  '<td></td>' +
+                '</tr>' +
+                '<tr>' +
+                  '<td colspan="4" style="font-style:italic;">Terbilang : <strong>' + terbilang(grandP) + '</strong></td>' +
+                '</tr>' +
+              '</tbody>' +
+            '</table>' +
+
+            '<div style="font-size:10pt; margin-bottom:10px;">' +
+              'Jumlah Uang Muka / Uang Panjar ( UM / UP ) : &nbsp;&nbsp; ' + (umRatio > 0 ? (umRatio * 100) + '% &nbsp; x &nbsp; ' + formatRupiah(grandP) + ' = <strong>' + formatRupiah(umAmount) + '</strong>' : '0') +
+            '</div>' +
+
+            '<div style="display:flex; justify-content:space-between; margin-top:10px; margin-bottom:16px; font-size:10pt;">' +
+              '<div style="width:46%;">' +
+                '<div>Telah dibayar UM/UP Sejumlah :</div>' +
+                '<div style="font-weight:bold; margin-bottom:6px;">' + formatRupiah(umAmount) + '</div>' +
+                '<div style="font-weight:bold;">Bendahara Pengeluaran ,</div>' +
+                '<div style="height:50px;"></div>' +
+                '<div style="font-weight:bold; text-decoration:underline;">' + pjBendahara.nama + '</div>' +
+                '<div>NIP. ' + pjBendahara.nip + '</div>' +
+              '</div>' +
+              '<div style="width:46%;">' +
+                '<div>Lahat, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2026</div>' +
+                '<div>Telah Diterima UM/UP Sejumlah</div>' +
+                '<div style="font-weight:bold; margin-bottom:6px;">' + formatRupiah(umAmount) + '</div>' +
+                '<div style="font-weight:bold;">Yang Menerima,</div>' +
+                '<div style="height:50px;"></div>' +
+                '<div style="font-weight:bold; text-decoration:underline;">' + p.nama + '</div>' +
+                '<div>Nip. ' + (p.nip || '-') + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div style="border-top:2px solid #000; padding-top:8px; font-size:10pt;">' +
+              '<div style="display:flex; justify-content:space-between; align-items:flex-start;">' +
+                '<div style="width:52%;">' +
+                  '<div style="font-weight:bold; text-decoration:underline; margin-bottom:6px;">PERHITUNGAN BIAYA SPD RAMPUNG</div>' +
+                  '<table style="width:100%;">' +
+                    '<tr><td style="width:170px;">Jumlah Biaya Nyata</td><td>: <strong>' + formatRupiah(grandP) + '</strong></td></tr>' +
+                    '<tr><td>Yang telah dibayar UM/UP</td><td>: ' + formatRupiah(grandP) + '</td></tr>' +
+                    '<tr><td>Sisa Kurang / Lebih</td><td>: Rp 0</td></tr>' +
+                  '</table>' +
+                '</div>' +
+                '<div style="width:44%;">' +
+                  '<div>Setuju dibayar,</div>' +
+                  '<div style="font-weight:bold; white-space:pre-line;">' + pjSPD.label + ' SELAKU PENGGUNA ANGGARAN</div>' +
+                  '<div style="height:48px;"></div>' +
+                  '<div style="font-weight:bold; text-decoration:underline;">' + pjSPD.nama + '</div>' +
+                  '<div>NIP. ' + pjSPD.nip + '</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        });
+      }
+
+// 5. KWITANSI / TANDA BUKTI PEMBAYARAN (TATA LETAK MENYESUAIKAN CONTOH KWITANSI)
+      if (docType === "ALL" || docType === "KWT") {
+        const totalST = calcSTTotal(st);
+        const repIdx = Number(st.penerimaKwitansiIdx) || 0;
+        const wakil = (st.personel && st.personel[repIdx]) ? st.personel[repIdx] : (st.personel ? st.personel[0] : { nama: "-", nip: "-" });
+        const daftarNamaST = (st.personel || []).map(x => x.nama).join(", ");
+        const pgWakil = pegawaiList.find(x => x.nip === wakil.nip) || {};
+        const kwtNpwp = st.kwtNpwp || pgWakil.npwp || "-";
+        const kwtBank = st.kwtBank || pgWakil.bank || "Sumsel Babel Cabang Lahat";
+        const kwtNorek = st.kwtNorek || pgWakil.norek || "-";
+        const nomorBuktiKwt = st.noBuktiKwt || generateNoBuktiKwitansi(st.subKegiatan, st.mataAnggaran);
+        const uraianKwt = 'Pembayaran ' + st.jenisPerjadin + ' dalam rangka ' + st.maksud + ' tanggal ' + formatTanggalIndo(st.tglBerangkat) + (st.tglBerangkat !== st.tglKembali ? ' s.d ' + formatTanggalIndo(st.tglKembali) : '') + ' ke ' + st.tujuanInstansi + ' di ' + st.tujuanKota + ' Provinsi ' + st.tujuanProv + ' a.n ' + daftarNamaST;
+
+        html += `
+          <div class="print-sheet doc-font bg-white shadow-md border border-slate-300 max-w-[215mm] mx-auto p-8 text-black" style="font-family:'Tahoma',serif; font-size:8.5pt; line-height:1.12;">
+            <div style="width:100%; border:1.4px solid #000; padding:1px; box-sizing:border-box;">
+              <table style="width:100%; border-collapse:collapse; table-layout:fixed; font-size:8.5pt;">
+                <tr>
+                  <td rowspan="3" style="width:17%; border:1px solid #000; text-align:center; vertical-align:middle; padding:4px;">
+                    <img src="https://lh3.googleusercontent.com/d/1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3" onerror="this.onerror=null; this.src='https://drive.google.com/uc?export=view&id=1zCfa80eyEcPdob6cfcQ2uvGylB9Ki9x3';" alt="Logo Kabupaten Lahat" style="width:78px; height:78px; object-fit:contain; margin:auto;" />
+                  </td>
+                  <td style="border:1px solid #000; text-align:center; font-weight:bold; font-size:11pt; line-height:1.05; padding:2px 4px;">
+                    PEMERINTAHAN KABUPATEN LAHAT<br/>BADAN PENDAPATAN DAERAH
+                  </td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #000; text-align:center; font-weight:bold; font-size:10pt; padding:2px 4px;">
+                    TANDA BUKTI PEMBAYARAN / SURAT BUKTI PENGELUARAN
+                  </td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #000; padding:2px 5px;">
+                    <table style="width:100%; border-collapse:collapse; font-size:8.5pt;">
+                      <tr><td style="width:105px; font-weight:bold;">Nomor Bukti</td><td>: <strong>${formatKwitansiNumberHTML(nomorBuktiKwt)}</strong></td></tr>
+                      <tr><td style="font-weight:bold;">Tanggal</td><td>:</td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table style="width:100%; border-collapse:collapse; font-size:8.2pt; border-bottom:1px solid #000; margin-bottom:2px;">
+                <tr><td style="width:25%; padding:2px 3px; font-weight:bold;">URUSAN PEMERINTAHAN</td><td style="width:2%;">:</td><td style="width:10%; font-weight:bold;">5</td><td style="font-weight:bold;">URUSAN PEMERINTAHAN PILIHAN</td></tr>
+                <tr><td style="padding:2px 3px; font-weight:bold;">UNIT ORGANISASI</td><td>:</td><td style="font-weight:bold;">5&nbsp;&nbsp;02</td><td style="font-weight:bold;">URUSAN PEMERINTAHAN BIDANG KEUANGAN</td></tr>
+                <tr><td style="padding:2px 3px 3px; font-weight:bold;">SUB UNIT ORGANISASI</td><td>:</td><td style="font-weight:bold;">5&nbsp;&nbsp;02&nbsp;&nbsp;60</td><td style="font-weight:bold;">BADAN PENDAPATAN DAERAH</td></tr>
+              </table>
+
+              <table style="width:100%; border-collapse:collapse; font-size:8.2pt;">
+                <tr>
+                  <td style="width:57%; padding:3px 5px;">Pembayaran Oleh Bendahara Pengeluaran, uang Sejumlah</td>
+                  <td style="width:5%; text-align:left; font-weight:bold;"></td>
+                  <td style="width:38%; padding:3px 6px; text-align:left; font-weight:bold; font-size:8pt;">${formatRupiah(totalST)}</td>
+                </tr>
+                <tr>
+                  <td colspan="3" style="padding:2px 5px 4px;">Terbilang : <strong><em>${terbilang(totalST)}</em></strong></td>
+                </tr>
+              </table>
+
+              <div style="padding:2px 5px 1px; font-weight:bold;">Yaitu untuk Pembayaran :</div>
+              <table style="width:100%; border-collapse:collapse; font-size:8.2pt;">
+                <tr><td style="width:21%; padding:2px 5px;">Kegiatan</td><td style="width:2%;">:</td><td style="padding:2px 3px;"><strong>5.02.04.2.01&nbsp;&nbsp; Kegiatan Pengelolaan pendapatan Daerah</strong></td></tr>
+                <tr><td style="padding:2px 5px;">Sub Kegiatan</td><td>:</td><td style="padding:2px 3px;"><strong>${st.subKegiatan || '09&nbsp;&nbsp; Pelayanan dan Konsultasi Pajak Daerah'}</strong></td></tr>
+                <tr><td style="padding:2px 5px;">Kode Rekening Belanja</td><td>:</td><td style="padding:2px 3px;"><strong>${st.mataAnggaran || '5.1.02.04.001.00001'}</strong></td></tr>
+                <tr><td style="padding:2px 5px; vertical-align:top;">Untuk Keperluan</td><td style="vertical-align:top;">:</td><td style="padding:2px 3px; text-align:justify; font-weight:bold;">${uraianKwt}</td></tr>
+                <tr><td colspan="3" style="padding:3px 5px 4px;">Dari Rekening Giro Nomor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:&nbsp;&nbsp; <strong>${st.rekGiroSKPD || '14231000472/Bank Sumsel Cabang Lahat'}</strong></td></tr>
+              </table>
+
+              <table style="width:100%; border-collapse:collapse; font-size:8.2pt; border-top:1px solid #000; border-bottom:1px solid #000; table-layout:fixed;">
+                <tr>
+                  <td style="width:56%; vertical-align:top; padding:3px 5px; border-right:1px solid #000;">
+                    <div style="font-weight:bold; margin-bottom:2px;">Yang berhak menerima pembayaran :</div>
+                    <table style="width:100%; border-collapse:collapse;">
+                      <tr><td style="width:105px;">Nama</td><td style="width:10px;">:</td><td><strong>${wakil.nama}</strong></td></tr>
+                      <tr><td>Alamat</td><td>:</td><td>Lahat</td></tr>
+                      <tr><td>NPWP</td><td>:</td><td>${kwtNpwp}</td></tr>
+                      <tr><td>Bank Penerima</td><td>:</td><td>${kwtBank}</td></tr>
+                      <tr><td>Rek. Penerima</td><td>:</td><td>${kwtNorek}</td></tr>
+                    </table>
+                  </td>
+                  <td style="width:44%; vertical-align:top; padding:3px 5px;">
+                    <div style="font-weight:bold; margin-bottom:2px;">Informasi Potongan Pajak</div>
+                    <table style="width:100%; border-collapse:collapse;">
+                      <tr><td>- Pajak PPN</td><td style="width:35px; text-align:center;">Rp</td><td style="width:55px; text-align:right;">-</td></tr>
+                      <tr><td>- Pajak PPh 22</td><td style="text-align:center;">Rp</td><td style="text-align:right;">-</td></tr>
+                      <tr><td>- PFK Lainnya (PAD).. ..</td><td style="text-align:center;">Rp</td><td style="text-align:right;">-</td></tr>
+                      <tr style="border-top:1px solid #000; font-weight:bold;"><td>Jumlah</td><td style="text-align:center;">Rp</td><td style="text-align:right;">-</td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <table style="width:100%; border-collapse:collapse; font-size:8.5pt; border-bottom:1px solid #000;">
+                <tr><td style="width:28%; padding:3px 5px;">Pembayaran Netto sejumlah</td><td style="width:4%; text-align:left;">:</td><td style="font-weight:bold; padding:3px 5px;"> &nbsp;&nbsp; ${formatRupiah(totalST)}</td></tr>
+                <tr><td style="padding:2px 5px 4px;">Terbilang</td><td>:</td><td style="padding:2px 5px 4px; font-weight:bold; font-style:italic;">${terbilang(totalST)}</td></tr>
+              </table>
+
+              <table style="width:100%; border-collapse:collapse; table-layout:fixed; text-align:center; font-size:8pt;">
+                <tr>
+                  <td style="width:25%; border:1px solid #000; height:34px; vertical-align:middle; font-weight:bold;">PENGGUNA ANGGARAN</td>
+                  <td style="width:25%; border:1px solid #000; height:34px; vertical-align:middle; font-weight:bold;">PEJABAT PELAKSANA TEKNIS<br/>KEGIATAN</td>
+                  <td style="width:25%; border:1px solid #000; height:34px; vertical-align:middle; font-weight:bold;">BENDAHARA PENGELUARAN,</td>
+                  <td style="width:25%; border:1px solid #000; height:34px; vertical-align:middle; font-weight:bold;">PENERIMA,</td>
+                </tr>
+                <tr>
+                  <td style="border:1px solid #000; height:105px; vertical-align:bottom; padding:4px 2px;"><strong style="text-decoration:underline;">${pjSPD.nama}</strong><br/>NIP. ${pjSPD.nip}</td>
+                  <td style="border:1px solid #000; height:105px; vertical-align:bottom; padding:4px 2px;"><strong style="text-decoration:underline;">${pjPPTK.nama}</strong><br/>NIP. ${pjPPTK.nip}</td>
+                  <td style="border:1px solid #000; height:105px; vertical-align:bottom; padding:4px 2px;"><strong style="text-decoration:underline;">${pjBendahara.nama}</strong><br/>NIP. ${pjBendahara.nip}</td>
+                  <td style="border:1px solid #000; height:105px; vertical-align:bottom; padding:4px 2px;">
+                    <div style="margin-bottom:52px;">Lahat, &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2026</div>
+                    <strong style="text-decoration:underline;">${wakil.nama}</strong><br/>NIP. ${wakil.nip || '-'}
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; margin-top:12px; font-size:8pt;">
+              <tr>
+                <td style="width:25%; text-align:right; padding:3px 5px;">Tanggal Transaksi Bank :</td>
+                <td style="width:30%; border:1px solid #000; height:18px;"></td>
+                <td style="padding-left:5px; font-style:italic;">(Tulis Tangan &amp; Paraf BP / BPP)</td>
+              </tr>
+              <tr>
+                <td style="text-align:right; padding:3px 5px;">Tanggal Input TBP/SBP :</td>
+                <td style="border:1px solid #000; height:18px;"></td>
+                <td style="padding-left:5px; font-style:italic;">(Tulis Tangan &amp; Paraf PPK / PPK Pembantu)</td>
+              </tr>
+              <tr>
+                <td style="text-align:right; padding:3px 5px;">Tanggal SPJ :</td>
+                <td style="border:1px solid #000; height:18px;"></td>
+                <td style="padding-left:5px; font-style:italic;">(Tulis Tangan &amp; Paraf PPK / PPK Pembantu)</td>
+              </tr>
+            </table>
+          </div>`;
+      }
+      area.innerHTML = html;
+    }
+
+    // Memuat pengaturan kertas/margin yang terakhir digunakan.
+    document.addEventListener('DOMContentLoaded', loadPrintSettings);
+    if (document.readyState !== 'loading') loadPrintSettings();
+  </script>
+</body>
+</html>
