@@ -560,7 +560,7 @@
     <section id="tab-print" class="tab-section hidden space-y-4">
       <div class="no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2">
-          <label class="text-xs font-semibold text-slate-700">Pilih Surat Tugas:</label>
+          <label id="printSelectSTLabel" class="text-xs font-semibold text-slate-700">Pilih Surat Tugas:</label>
           <select id="printSelectST" onchange="renderPrintDocuments()" class="text-sm px-3 py-2 border border-slate-300 rounded-lg bg-white min-w-[260px]"></select>
 
           <label class="text-xs font-semibold text-slate-700 ml-2">Jenis Dokumen:</label>
@@ -571,7 +571,23 @@
             <option value="SPD_BACK">3. SPD Lembar Belakang (Pengesahan I-VIII)</option>
             <option value="SPJ">4. Rincian Biaya Perjalanan Dinas (Per Personel)</option>
             <option value="KWT">5. Kwitansi / Tanda Bukti Pembayaran (1 Perwakilan)</option>
+            <option value="TRANSFER">6. Daftar Transfer Penerima Perjalanan Dinas (Akumulasi)</option>
           </select>
+
+          <div id="transferSTPickerWrap" class="hidden w-full mt-3 border-t border-slate-200 pt-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+              <div>
+                <div class="text-sm font-bold text-slate-800">Pilih Surat Tugas yang akan dimasukkan ke daftar transfer</div>
+                <div class="text-xs text-slate-500">Centang satu atau beberapa ST. ST dengan subkegiatan berbeda tidak dapat digabung dalam satu daftar.</div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="clearTransferSTSelection()" class="text-xs px-3 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100">Bersihkan Pilihan</button>
+                <button type="button" onclick="markSelectedTransferSTPaid()" class="text-xs px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">Tandai ST Terpilih Sudah Dicairkan</button>
+              </div>
+            </div>
+            <div id="transferSTPicker" class="overflow-x-auto border border-slate-200 rounded-lg"></div>
+            <div id="transferSTSelectionInfo" class="text-xs font-semibold text-sky-800 bg-sky-50 border border-sky-100 rounded-lg p-2 mt-2">Belum ada ST yang dipilih.</div>
+          </div>
         </div>
 
         <div class="w-full border-t border-slate-200 pt-3 mt-1 flex flex-wrap items-end gap-2">
@@ -1016,6 +1032,8 @@ function writeSheetJson(sheet, dataArray, keyField) {
     let pejabatList = [];
     let tarifList = [];
     let stList = [];
+    // ST yang dipilih untuk satu kali pencetakan daftar transfer.
+    let selectedTransferSTIds = new Set();
     let cloudConfig = {
       url: "",
       autoSync: true,
@@ -2808,10 +2826,195 @@ function writeSheetJson(sheet, dataArray, keyField) {
       '</div>';
     }
 
+    function getTransferEligibleST() {
+      return (stList || []).filter(st =>
+        !st.jenisPerjadin || st.jenisPerjadin === 'Perjalanan Dinas Biasa'
+      );
+    }
+
+    function renderTransferSTPicker() {
+      const host = document.getElementById('transferSTPicker');
+      const info = document.getElementById('transferSTSelectionInfo');
+      if (!host || !info) return;
+      const eligible = getTransferEligibleST();
+      const eligibleIds = new Set(eligible.filter(st => !st.transferPaid).map(st => String(st.id)));
+      selectedTransferSTIds = new Set([...selectedTransferSTIds].filter(id => eligibleIds.has(String(id))));
+
+      if (!eligible.length) {
+        host.innerHTML = '<div class="p-4 text-sm text-slate-500 text-center">Belum ada ST Perjalanan Dinas Biasa.</div>';
+        info.textContent = 'Belum ada ST yang dapat dipilih.';
+        return;
+      }
+
+      const selected = eligible.filter(st => selectedTransferSTIds.has(String(st.id)));
+      const lockedSub = selected.length ? (selected[0].subKegiatan || '').trim() : '';
+      const rows = eligible.map((st, idx) => {
+        const id = String(st.id);
+        const sub = (st.subKegiatan || '').trim();
+        const checked = selectedTransferSTIds.has(id);
+        const paid = !!st.transferPaid;
+        const disabled = paid || (!!lockedSub && sub !== lockedSub);
+        const tgl = st.tglST ? formatTanggalIndo(st.tglST) : '-';
+        return '<tr class="border-t border-slate-200 ' + (checked ? 'bg-sky-50' : '') + '">' +
+          '<td class="p-2 text-center"><input type="checkbox" class="w-4 h-4" data-transfer-st-id="' + escapePrintText(id) + '" ' + (checked ? 'checked ' : '') + (disabled ? 'disabled ' : '') + 'onchange="toggleTransferST(this)" /></td>' +
+          '<td class="p-2 text-center">' + (idx + 1) + '</td>' +
+          '<td class="p-2 whitespace-nowrap font-semibold">' + escapePrintText(st.noST || '(Belum bernomor)') + '</td>' +
+          '<td class="p-2 whitespace-nowrap">' + escapePrintText(tgl) + '</td>' +
+          '<td class="p-2 min-w-[220px]">' + escapePrintText(sub || '-') + '</td>' +
+          '<td class="p-2 min-w-[220px]">' + escapePrintText(st.maksud || '-') + '</td>' +
+          '<td class="p-2 text-right whitespace-nowrap">' + formatRupiah(calcSTTotal(st)) + '</td>' +
+          '<td class="p-2 whitespace-nowrap font-semibold ' + (paid ? 'text-emerald-700' : 'text-slate-500') + '">' + (paid ? 'Sudah dicairkan' : 'Belum dicairkan') + '</td>' +
+        '</tr>';
+      }).join('');
+      host.innerHTML = '<table class="w-full text-xs text-left"><thead class="bg-slate-800 text-white"><tr>' +
+        '<th class="p-2 text-center">PILIH</th><th class="p-2">NO</th><th class="p-2">NOMOR ST</th><th class="p-2">TANGGAL</th><th class="p-2">SUB KEGIATAN</th><th class="p-2">MAKSUD KEGIATAN</th><th class="p-2 text-right">TOTAL SPJ</th><th class="p-2">STATUS</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table>';
+
+      if (!selected.length) {
+        info.textContent = 'Belum ada ST yang dipilih. Pilih ST yang akan diajukan untuk transfer.';
+      } else {
+        const total = selected.reduce((sum, st) => sum + calcSTTotal(st), 0);
+        info.textContent = selected.length + ' ST dipilih • Subkegiatan: ' + (lockedSub || '(Subkegiatan belum diisi)') + ' • Total SPJ: ' + formatRupiah(total);
+      }
+    }
+
+    function toggleTransferST(input) {
+      const id = String(input.getAttribute('data-transfer-st-id') || '');
+      if (!id) return;
+      if (input.checked) {
+        const st = stList.find(x => String(x.id) === id);
+        const current = [...selectedTransferSTIds].map(selectedId => stList.find(x => String(x.id) === String(selectedId))).filter(Boolean);
+        if (current.length && (current[0].subKegiatan || '').trim() !== ((st && st.subKegiatan) || '').trim()) {
+          input.checked = false;
+          showToast('ST dengan subkegiatan berbeda tidak dapat digabung dalam satu daftar transfer.', '⚠️');
+          return;
+        }
+        selectedTransferSTIds.add(id);
+      } else {
+        selectedTransferSTIds.delete(id);
+      }
+      renderPrintDocuments();
+    }
+
+    function clearTransferSTSelection() {
+      selectedTransferSTIds.clear();
+      renderPrintDocuments();
+    }
+
+    function markSelectedTransferSTPaid() {
+      const selected = [...selectedTransferSTIds];
+      if (!selected.length) {
+        showToast('Pilih ST terlebih dahulu.', '⚠️');
+        return;
+      }
+      if (!confirm('Tandai ' + selected.length + ' ST terpilih sebagai SUDAH DICAIRKAN? ST tersebut tidak akan dapat dipilih lagi untuk daftar transfer berikutnya. Pastikan transfer bank benar-benar sudah dilakukan.')) return;
+      const today = new Date();
+      const date = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      stList.forEach(st => {
+        if (selected.includes(String(st.id))) {
+          st.transferPaid = true;
+          st.transferPaidAt = date;
+        }
+      });
+      selectedTransferSTIds.clear();
+      saveLocalState(true);
+      renderDashboard();
+      renderPrintDocuments();
+      showToast('Status pencairan ST berhasil diperbarui.', '✅');
+    }
+
+    function renderDaftarTransfer() {
+      const area = document.getElementById('printArea');
+      renderTransferSTPicker();
+      const matchingST = getTransferEligibleST().filter(st => !st.transferPaid && selectedTransferSTIds.has(String(st.id)));
+      if (!matchingST.length) {
+        area.innerHTML = '<div class="bg-white p-8 rounded-xl text-center text-slate-400">Pilih minimal satu Surat Tugas pada daftar di atas untuk membuat daftar transfer.</div>';
+        return;
+      }
+
+      const selectedSub = (matchingST[0].subKegiatan || '').trim();
+      // Pengaman tambahan: daftar transfer hanya boleh memuat satu subkegiatan.
+      if (matchingST.some(st => (st.subKegiatan || '').trim() !== selectedSub)) {
+        area.innerHTML = '<div class="bg-amber-50 border border-amber-200 p-6 rounded-xl text-center text-amber-800">Subkegiatan ST yang dipilih berbeda. Pisahkan pilihan menjadi daftar transfer tersendiri.</div>';
+        return;
+      }
+
+      // Akumulasi hanya dari ST yang dicentang, berdasarkan NIP atau nama jika NIP tidak tersedia.
+      const grouped = new Map();
+      matchingST.forEach(st => {
+        (st.personel || []).forEach(p => {
+          const nama = (p.nama || '').trim();
+          if (!nama) return;
+          const nip = (p.nip || '').trim();
+          const normalizedNip = nip.replace(/\s+/g, '');
+          const key = normalizedNip ? 'NIP:' + normalizedNip : 'NAMA:' + nama.toLocaleLowerCase('id-ID').replace(/\s+/g, ' ');
+          const master = pegawaiList.find(pg =>
+            (normalizedNip && (pg.nip || '').trim().replace(/\s+/g, '') === normalizedNip) ||
+            (!normalizedNip && (pg.nama || '').trim().toLocaleLowerCase('id-ID') === nama.toLocaleLowerCase('id-ID'))
+          ) || {};
+          if (!grouped.has(key)) {
+            grouped.set(key, { nama, nip, bank: p.bank || master.bank || '', norek: p.norek || master.norek || '', jumlah: 0 });
+          }
+          const row = grouped.get(key);
+          row.jumlah += calcPersonelTotal(p);
+          if (!row.bank && (master.bank || p.bank)) row.bank = master.bank || p.bank;
+          if (!row.norek && (master.norek || p.norek)) row.norek = master.norek || p.norek;
+        });
+      });
+
+      const rows = Array.from(grouped.values()).sort((a, b) => a.nama.localeCompare(b.nama, 'id'));
+      const total = rows.reduce((sum, row) => sum + row.jumlah, 0);
+      const subDescription = selectedSub.replace(/^\s*\d+(?:\.\d+)*\s*/, '').trim() || selectedSub;
+      const today = new Date();
+      const tanggalCetak = formatTanggalIndo(today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0'));
+      const latestST = matchingST.slice().sort((a, b) => String(b.tglST || '').localeCompare(String(a.tglST || '')))[0];
+      const penandatangan = pejabatList.find(x => x.id === latestST.ttdST) ||
+        pejabatList.find(x => (x.label || '').toUpperCase().includes('KABID PAJAK DAERAH')) || pejabatList[0] ||
+        { nama: '', pangkat: '', nip: '', label: '' };
+
+      const tableRows = rows.map((row, idx) =>
+        '<tr><td style="text-align:center;">' + (idx + 1) + '</td>' +
+        '<td>' + escapePrintText(row.nama) + '</td>' +
+        '<td>' + escapePrintText(row.bank || '-') + '</td>' +
+        '<td style="text-align:center;">' + escapePrintText(row.norek || '-') + '</td>' +
+        '<td style="text-align:right; white-space:nowrap;">' + formatRupiah(row.jumlah).replace(/^Rp\s*/, '') + '</td></tr>'
+      ).join('');
+      const selectedSTSummary = matchingST.map(st => escapePrintText(st.noST || '(Belum bernomor)')).join(', ');
+
+      area.innerHTML =
+        '<div class="print-sheet doc-font bg-white shadow-md border border-slate-300 max-w-[215mm] mx-auto p-8 text-[10.5pt] leading-snug text-black">' +
+          '<div style="text-align:center; font-weight:bold; font-size:12pt; line-height:1.35; margin-bottom:12px;">' +
+            'DAFTAR TRANSFER PENERIMA PERJALANAN DINAS BIASA' +
+            '<div style="font-size:11pt;">KEGIATAN ' + escapePrintText(subDescription).toUpperCase() + '</div>' +
+          '</div>' +
+          '<div style="font-size:8.5pt; margin-bottom:8px;">Nomor ST: ' + selectedSTSummary + '</div>' +
+          '<table class="doc-table" style="font-size:10pt;"><thead><tr style="text-align:center; font-weight:bold;">' +
+            '<th style="width:32px;">NO</th><th>NAMA</th><th style="width:115px;">BANK</th><th style="width:145px;">NOMOR REKENING</th><th style="width:125px;">JUMLAH</th>' +
+          '</tr></thead><tbody>' + tableRows +
+            '<tr style="font-weight:bold;"><td colspan="4" style="text-align:center;">Jumlah</td><td style="text-align:right; white-space:nowrap;">' + formatRupiah(total).replace(/^Rp\s*/, '') + '</td></tr>' +
+          '</tbody></table>' +
+          '<div style="display:flex; justify-content:flex-end; margin-top:24px; font-size:10pt;"><div style="width:285px; text-align:center;">' +
+            '<div>Lahat, ' + tanggalCetak + '</div><div style="font-weight:bold; margin-top:4px; white-space:pre-line;">' + escapePrintText(penandatangan.label || '') + '</div>' +
+            '<div style="height:68px;"></div><div style="font-weight:bold; text-decoration:underline;">' + escapePrintText(penandatangan.nama || '') + '</div>' +
+            '<div>' + escapePrintText(penandatangan.pangkat || '') + '</div><div>NIP. ' + escapePrintText(penandatangan.nip || '-') + '</div>' +
+          '</div></div>' +
+        '</div>';
+    }
+
     function renderPrintDocuments() {
       const area = document.getElementById('printArea');
-      const stId = document.getElementById('printSelectST').value;
       const docType = document.getElementById('printDocType').value;
+      const isTransfer = docType === 'TRANSFER';
+      document.getElementById('printSelectSTLabel').classList.toggle('hidden', isTransfer);
+      document.getElementById('printSelectST').classList.toggle('hidden', isTransfer);
+      const transferWrap = document.getElementById('transferSTPickerWrap');
+      transferWrap.classList.toggle('hidden', !isTransfer);
+      if (isTransfer) {
+        renderDaftarTransfer();
+        return;
+      }
+
+      const stId = document.getElementById('printSelectST').value;
       const st = stList.find(x => x.id === stId);
 
       if (!st) {
