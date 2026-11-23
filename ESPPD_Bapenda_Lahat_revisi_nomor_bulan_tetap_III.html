@@ -3372,15 +3372,32 @@ function writeSheetJson(sheet, dataArray, keyField) {
 
               <div style="padding:2px 5px 1px; font-weight:bold;">Yaitu untuk Pembayaran :</div>
               <table style="width:100%; border-collapse:collapse; font-size:8.2pt;">
-                <tr><td style="width:21%; padding:2px 5px;">Kegiatan</td><td style="width:2%;">:</td><td style="padding:2px 3px;"><strong>5.02.04.2.01&nbsp;&nbsp; Kegiatan Pengelolaan pendapatan Daerah</strong></td></tr>
-                <tr><td style="padding:2px 5px;">Sub Kegiatan</td><td>:</td><td style="padding:2px 3px;"><strong>${st.subKegiatan || '09&nbsp;&nbsp; Pelayanan dan Konsultasi Pajak Daerah'}</strong></td></tr>
-                <tr><td style="padding:2px 5px;">Kode Rekening Belanja</td><td>:</td><td style="padding:2px 3px;"><strong>${st.mataAnggaran || '5.1.02.04.001.00001'}</strong></td></tr>
-                <tr><td style="padding:2px 5px; vertical-align:top;">Untuk Keperluan</td><td style="vertical-align:top;">:</td><td style="padding:2px 3px; text-align:justify; font-weight:bold;">${uraianKwt}</td></tr>
-                <tr><td style="padding:3px 5px 4px; white-space:nowrap;">Dari Rekening Giro Nomor</td>
+                <tr>
+                <td style="width:21%; padding:2px 5px; white-space:nowrap;">Kegiatan</td>
+                <td style="width:2%; padding:2px 0; text-align:center;">:</td>
+                <td style="padding:2px 3px;"><strong>5.02.04.2.01&nbsp;&nbsp; Kegiatan Pengelolaan pendapatan Daerah</strong></td>
+                </tr>
+                <tr>
+                <td style="padding:2px 5px; white-space:nowrap;">Sub Kegiatan</td>
+                <td style="padding:2px 0; text-align:center;">:</td>
+                <td style="padding:2px 3px;"><strong>${st.subKegiatan || '09&nbsp;&nbsp; Pelayanan dan Konsultasi Pajak Daerah'}</strong></td>
+                </tr>
+                <tr>
+                <td style="padding:2px 5px; white-space:nowrap;">Kode Rekening Belanja</td>
+                <td style="padding:2px 0; text-align:center;">:</td>
+                <td style="padding:2px 3px;"><strong>${st.mataAnggaran || '5.1.02.04.001.00001'}</strong></td>
+                </tr>
+                <tr>
+                <td style="padding:2px 5px; white-space:nowrap; vertical-align:top;">Untuk Keperluan</td>
+                <td style="padding:2px 0; text-align:center; vertical-align:top;">:</td>
+                <td style="padding:2px 3px; text-align:justify; font-weight:bold;">${uraianKwt}</td>
+                </tr>
+                <tr>
+                <td style="padding:3px 5px 4px; white-space:nowrap;">Dari Rekening Giro Nomor</td>
                 <td style="padding:3px 0 4px; text-align:center;">:</td>
                 <td style="padding:3px 3px 4px;"><strong>${st.rekGiroSKPD || '14231000472/Bank Sumsel Cabang Lahat'}</strong></td>
                 </tr>
-              </table>
+                </table>
 
               <table style="width:100%; border-collapse:collapse; font-size:8.2pt; border-top:1px solid #000; border-bottom:1px solid #000; table-layout:fixed;">
                 <tr>
